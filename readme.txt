@@ -10,7 +10,7 @@ Generates more specific previous / next post links based on referrer.
 
 == Description ==
 
-The default previous_post_link() and next_post_link() have an option to restrict adjacent posts to the current category. This plugin takes one step further:
+The default `previous_post_link()` and `next_post_link()` have an option to restrict adjacent posts to the current category. This plugin takes one step further:
 
 If you visit an archive page (category, tag, date, author, search etc.) and then visit a single post from that page, the previous_post_smart() and next_post_smart() will point only to the other posts in that archive page.
 
