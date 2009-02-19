@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.0
+Version: 1.0.1a
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -31,7 +31,8 @@ class persistent_referrer {
 		'title' => ''
 	);
 
-	function __construct($name) {
+	// Constructor
+	function persistent_referrer($name) {
 		$this->name = $name;
 
 		// Fire as soon as posts have been retrieved
@@ -57,7 +58,7 @@ class persistent_referrer {
 			return false;
 
 		foreach ( array_keys($this->data) as $key )
-			setcookie("{$this->name}[$key]", false, time() - 3600, '/');
+			setcookie($this->name."[$key]", false, time() - 3600, '/');
 	}
 
 	function set_cookie() {
@@ -77,7 +78,7 @@ class persistent_referrer {
 
 		// Store data in cookies
 		foreach ( $data as $key => $value )
-			setcookie("{$this->name}[$key]", $value, 0 , '/');
+			setcookie($this->name."[$key]", $value, 0 , '/');
 	}
 
 	function read_cookie() {
@@ -87,7 +88,8 @@ class persistent_referrer {
 		$this->data = $_COOKIE[$this->name];
 		$this->data['ids'] = explode(' ', $this->data['ids']);
 
-echo '<!--'; var_dump($_COOKIE[$this->name]); echo '-->';
+# DEBUG
+# echo '<!--'; var_dump($_COOKIE[$this->name]); echo '-->';
 	}
 }
 
