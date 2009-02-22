@@ -1,7 +1,7 @@
 <?php
 
 // Displays a link to the persistent referer
-function referrer_link($format = '%link', $title = '%title') {
+function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;') {
 	global $persistent_referrer;
 
 	if ( !is_single() )
@@ -13,7 +13,7 @@ function referrer_link($format = '%link', $title = '%title') {
 
 	$url = $persistent_referrer->data['url'];
 
-	$title = str_replace('%title', $persistent_referrer->data['title'], $title);
+	$title = str_replace('%title', $persistent_referrer->get_title($sep), $title);
 	$link = sprintf("<a href='%s'>%s</a>", $url, $title);
 	echo str_replace('%link', $link, $format);
 }

@@ -40,4 +40,4 @@ Short answer: it depends.
 
 It won't work properly with WP Super Cache because it generate links specific to each user.
 
-It will work with DB Cache because it doesn't interact with the database at all (it uses cookies to remember the referrer).
+It will work with DB Cache because it doesn't interact with the database at all (it uses cookies).
