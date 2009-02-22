@@ -23,7 +23,11 @@ If there isn’t a previous post in a set, the normal template tag will be calle
 
 The same goes for `next_post_link()`.
 
-There is also a `referrer_link()` template tag which also has two arguments that work in the same way: $format & $title.
+There is also a `referrer_link()` template tag which displays a link to the referrer. Args:
+
+* $format = '%link'
+* $title = '%title'
+* `$sep = '&raquo;'`
 
 You can learn more about these by looking at the template-tags.php file.
 
