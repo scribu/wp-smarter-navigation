@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.0.2
+Version: 1.0.3
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -42,15 +42,15 @@ class persistent_referrer {
 	function manage_cookie() {
 		// Default conditions
 		$read_cond = is_single();
-		$clear_cond = ( is_front_page() || is_page() ) && empty($_SERVER['QUERY_STRING']);
-		$set_cond = true;
+		$set_cond = is_archive() || is_search();
+		$clear_cond = true;
 
-		if ( $read_cond )
+		if ( apply_filters('smarter_nav_read', $read_cond) )
 			$this->read_cookie();
-		elseif ( $clear_cond )
-			$this->clear_cookie();
-		elseif ( $set_cond )
+		elseif ( apply_filters('smarter_nav_set', $set_cond) )
 			$this->set_cookie();
+		elseif ( apply_filters('smarter_nav_clear', $clear_cond) )
+			$this->clear_cookie();
 	}
 
 	function clear_cookie() {
@@ -74,7 +74,6 @@ class persistent_referrer {
 
 		// Collect title
 		$data['title'] = trim(wp_title('__SEP__', false, 'left'));
-		$data['title'] = substr($data['title'], 7);	// remove hanging separator
 
 		if ( empty($data['title']) )
 			$data['title'] = 'Referrer';
@@ -92,8 +91,15 @@ class persistent_referrer {
 		$this->data['ids'] = explode(' ', $this->data['ids']);
 	}
 
-	function get_title($sep) {
-		return str_replace('__SEP__', $sep, $this->data['title']);
+	function get_title($sep, $sepdir) {
+		$sep = trim($sep);
+		$parts = explode('__SEP__', $this->data['title']);
+		unset($parts[0]);
+
+		if ( 'right' == $sepdir )
+			$parts = array_reverse($parts);
+
+		return implode(" $sep ", $parts);
 	}
 }
 

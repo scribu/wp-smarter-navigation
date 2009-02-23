@@ -27,7 +27,8 @@ There is also a `referrer_link()` template tag which displays a link to the refe
 
 * $format = '%link'
 * $title = '%title'
-* `$sep = '&raquo;'`
+* $sep = '&amp;raquo;'
+* $seplocation = 'left'
 
 You can learn more about these by looking at the template-tags.php file.
 
