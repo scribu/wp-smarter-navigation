@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.1
+Version: 1.1.1
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -113,7 +113,20 @@ class persistent_referrer {
 		// replace LIMIT
 		// todo: make sure we're replacing the last LIMIT clause
 		$query = explode('LIMIT', $query, 2);
-		$query = $query[0] . 'LIMIT 500';
+
+		$count = 500;
+
+		$limit = explode(',', $query[1]);
+		$start = (int) $limit[0];
+		$finish = (int) $limit[1];
+
+		$new_start = $start - $count/2 + ($finish - $start)/2;
+		if ( $new_start < 0 )
+			$new_start = 0;
+
+		$new_finish = $new_start + $count;
+
+		$query = $query[0] . "LIMIT $new_start, $new_finish";
 
 		return $wpdb->get_col($query);
 	}
