@@ -3,7 +3,7 @@ Contributors: scribu
 Donate link: http://scribu.net/wordpress
 Tags: archive, navigation, next, previous, referrer
 Requires at least: 2.0
-Tested up to: 2.7.1
+Tested up to: 2.8
 Stable tag: trunk
 
 Generates more specific previous / next post links based on referrer.
