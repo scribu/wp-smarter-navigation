@@ -46,3 +46,15 @@ Short answer: it depends.
 It won't work properly with WP Super Cache because it generate links specific to each user.
 
 It will work with DB Cache because it doesn't interact with the database at all (it uses cookies).
+
+== Changelog ==
+
+= 1.1 =
+* handles posts split on multiple pages
+* better behaviour when multiple tabs open
+* [more info](http://scribu.net/wordpress/smarter-navigation/sn-1-1.html)
+
+= 1.0 =
+* initial release
+* [more info](http://scribu.net/wordpress/smarter-navigation/sn-1-0.html)
+
