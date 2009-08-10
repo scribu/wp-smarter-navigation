@@ -49,6 +49,12 @@ It will work with DB Cache because it doesn't interact with the database at all 
 
 == Changelog ==
 
+= 1.1.2 =
+* added $fallback parameter to *_post_smart()
+
+= 1.1.1 =
+* better SQL limit
+
 = 1.1 =
 * handles posts split on multiple pages
 * better behaviour when multiple tabs open
