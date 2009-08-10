@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.1.1
+Version: 1.1.2
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -35,14 +35,16 @@ class persistent_referrer {
 	var $sep = '__SEP__';
 
 	// Constructor
-	function persistent_referrer($name) {
+	function persistent_referrer($name)
+	{
 		$this->name = $name;
 
 		// Fire as soon as posts have been retrieved
 		add_action('wp', array($this, 'manage_cookie'));
 	}
 
-	function manage_cookie() {
+	function manage_cookie()
+	{
 		// Default conditions
 		$read_cond = is_single();
 		$set_cond = is_archive() || is_search();
@@ -56,15 +58,21 @@ class persistent_referrer {
 			$this->clear_cookie();
 	}
 
-	function clear_cookie() {
+	function read_cookie()
+	{
+#		debug('read', $_COOKIE[$this->name]);
+
 		if ( empty($_COOKIE[$this->name]) )
 			return false;
 
-		foreach ( array_keys($this->data) as $key )
-			setcookie($this->name."[$key]", false, time() - 3600, '/');
+		$this->data = $_COOKIE[$this->name];
+		$this->data['ids'] = explode(' ', $this->data['ids']);
+
+		$this->validate();		
 	}
 
-	function set_cookie() {
+	function set_cookie()
+	{
 		// Collect ids
 		$data['ids'] = implode(' ', $this->_collect_ids());
 
@@ -79,21 +87,25 @@ class persistent_referrer {
 
 		// Store data in cookies
 		foreach ( $data as $key => $value )
-			setcookie($this->name."[$key]", $value, 0 , '/');
+			setcookie($this->name."[$key]", $value, 0, '/');
+
+# 		debug('set', $_COOKIE[$this->name]);
 	}
 
-	function read_cookie() {
+	function clear_cookie()
+	{
+#		debug('clear', $_COOKIE[$this->name]);
+
 		if ( empty($_COOKIE[$this->name]) )
 			return false;
 
-		$this->data = $_COOKIE[$this->name];
-		$this->data['ids'] = explode(' ', $this->data['ids']);
-
-		$this->validate();		
+		foreach ( array_keys($this->data) as $key )
+			setcookie($this->name."[$key]", false, time() - 3600, '/');
 	}
 
 	// Checks if the current post is in the data set
-	function validate() {
+	function validate()
+	{
 		global $posts;
 
 		if ( !in_array($posts[0]->ID, $this->data['ids']) )
@@ -101,7 +113,8 @@ class persistent_referrer {
 //			$this->clear_cookie();	// cookie might still be useful
 	}
 
-	function _collect_ids() {
+	function _collect_ids()
+	{
 		global $wpdb, $wp_query;
 
 		$query = $wp_query->request;
@@ -133,8 +146,10 @@ class persistent_referrer {
 }
 
 
-class smarterNavDisplay {
-	function get_title($sep, $sepdir) {
+class smarterNavDisplay 
+{
+	function get_title($sep, $sepdir)
+	{
 		global $persistent_referrer;
 
 		$sep = trim($sep);
@@ -147,14 +162,19 @@ class smarterNavDisplay {
 		return implode(" $sep ", $parts);
 	}
 
-	function adjacent_post($format, $title, $previous = false) {
+	function adjacent_post($format, $title, $previous = false, $fallback)
+	{
 		if ( !is_single() )
 			return false;
 
 		$id = smarterNavDisplay::get_adjacent_id($previous);
 
 		// If there's no data, generate normal nav link
-		if ( -1 == $id ) {
+		if ( -1 == $id )
+		{
+			if ( !$fallback )
+				return false;
+
 			if ( $previous )
 				return previous_post_link($format, $title);
 			else
@@ -170,7 +190,8 @@ class smarterNavDisplay {
 		echo str_replace('%link', $link, $format);
 	}
 
-	function get_adjacent_id($previous = false) {
+	function get_adjacent_id($previous = false)
+	{
 		global $post, $persistent_referrer;
 
 		if ( ! $ids = @array_reverse($persistent_referrer->data['ids']) )
@@ -179,7 +200,8 @@ class smarterNavDisplay {
 		$pos = array_search($post->ID, $ids);
 
 		// Get adjacent id
-		if ( $previous ) {
+		if ( $previous )
+		{
 			if ( 0 === $pos ) 
 				return false;
 			else 
