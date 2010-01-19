@@ -3,7 +3,7 @@ Contributors: scribu
 Donate link: http://scribu.net/wordpress
 Tags: archive, navigation, next, previous, referrer
 Requires at least: 2.0
-Tested up to: 2.9
+Tested up to: 2.9.1
 Stable tag: 1.1.2
 
 Generates more specific previous / next post links based on referrer.
@@ -40,14 +40,17 @@ You can learn more about these by looking at the template-tags.php file.
 
 == Frequently Asked Questions ==
 
-= Does it work with my favourite caching plugin? =
-Short answer: it depends.
+= "Parse error: syntax error, unexpected..." Help! =
 
-It won't work properly with WP Super Cache because it generate links specific to each user.
+Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 
-It will work with DB Cache because it doesn't interact with the database at all (it uses cookies).
+`var_dump(PHP_VERSION);`
 
 == Changelog ==
+
+= 1.2 =
+* Moved to PHP5 syntax
+* set cookie on 'template_redirect'
 
 = 1.1.2 =
 * added $fallback parameter to *_post_smart()
