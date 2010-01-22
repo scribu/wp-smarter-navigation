@@ -56,6 +56,8 @@ class Smarter_Navigation_Cookie {
 	}
 
 	private function read_cookie() {
+#		debug_a('read', $_COOKIE[self::NAME]);
+
 		if ( empty($_COOKIE[self::NAME]) )
 			return false;
 
@@ -70,7 +72,7 @@ class Smarter_Navigation_Cookie {
 		global $posts;
 
 		if ( !in_array($posts[0]->ID, self::$data['ids']) )
-			unset(self::$data);
+			self::$data = null;
 //			self::clear_cookie();	// cookie might still be useful
 	}
 
@@ -85,6 +87,8 @@ class Smarter_Navigation_Cookie {
 		$r = array();
 		foreach ( $data as $key => $value )
 			$r[self::get_name($key)] = setcookie(self::get_name($key), $value, 0, '/');
+
+#		debug_a('set', $r);
 	}
 
 	private function clear_cookie() {
@@ -93,6 +97,8 @@ class Smarter_Navigation_Cookie {
 
 		foreach ( array_keys($_COOKIE[self::NAME]) as $key )
 			setcookie(self::get_name($key), false, 0, '/');
+
+#		debug_a('clear');
 	}
 
 	private function get_name($key) {
@@ -164,7 +170,6 @@ class Smarter_Navigation_Display {
 
 		$id = self::get_adjacent_id($previous);
 
-		// If there's no data, generate normal nav link
 		if ( -1 == $id ) {
 			if ( !$fallback )
 				return false;
@@ -175,7 +180,6 @@ class Smarter_Navigation_Display {
 				return next_post_link($format, $title);
 		}
 
-		// If there is a cookie, but there isn't a link, bail
 		if ( false === $id )
 			return false;
 
@@ -199,7 +203,7 @@ class Smarter_Navigation_Display {
 
 			$id = $ids[$pos - 1];
 		} else {
-			if ( count($ids) - 1 === $pos ) 
+			if ( count($ids) - 1 === $pos )
 				return false;
 
 			$id = $ids[$pos + 1];
@@ -210,4 +214,13 @@ class Smarter_Navigation_Display {
 }
 
 include_once(dirname(__FILE__) . '/template-tags.php');
+
+function debug_a() {
+	if ( !current_user_can('administrator') )
+		return;
+
+	$args = func_get_args();
+
+	call_user_func_array('debug', $args);
+}
 
