@@ -52,6 +52,9 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 
 == Changelog ==
 
+= 1.2.1 =
+* enable $in_same_cat by default
+
 = 1.2 =
 * moved to PHP5 syntax
 * added get_referrer_category() and get_referrer_url() template tags
