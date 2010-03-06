@@ -30,9 +30,9 @@ There is also a `referrer_link()` template tag which displays a link to the refe
 * $sep = '&amp;raquo;'
 * $seplocation = 'left'
 
-You can also use `get_referrer_url()` to check the referrer URL.
+You can also use `get_referrer_category()` to retrieve the category object. This is useful when you have posts in multiple categories.
 
-You can learn more about these by looking at the template-tags.php file.
+You can learn more about these by looking at the `template-tags.php` file.
 
 == Installation ==
 
