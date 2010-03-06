@@ -2,13 +2,13 @@
 
 // Replaces previous_post_link()
 // if $fallback is set to true, previous_post_link() will be called if there is no post found
-function previous_post_smart($format = '&laquo; %link', $title = '%title', $fallback = true, $in_same_cat = false, $excluded_categories = '') {
+function previous_post_smart($format = '&laquo; %link', $title = '%title', $fallback = true, $in_same_cat = true, $excluded_categories = '') {
 	return Smarter_Navigation_Display::adjacent_post($format, $title, true, $fallback, $in_same_cat, $excluded_categories);
 }
 
 // Replaces next_post_link()
 // if $fallback is set to true, next_post_link() will be called if there is no post found
-function next_post_smart($format = '%link &raquo;', $title = '%title', $fallback = true, $in_same_cat = false, $excluded_categories = '') {
+function next_post_smart($format = '%link &raquo;', $title = '%title', $fallback = true, $in_same_cat = true, $excluded_categories = '') {
 	return Smarter_Navigation_Display::adjacent_post($format, $title, false, $fallback, $in_same_cat, $excluded_categories);
 }
 
