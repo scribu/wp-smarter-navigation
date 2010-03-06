@@ -49,7 +49,9 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 == Changelog ==
 
 = 1.2 =
-* Moved to PHP5 syntax
+* added get_referrer_url() template tag
+* added $in_same_cat and $excluded_categories arguments
+* moved to PHP5 syntax
 * set cookie on 'template_redirect'
 
 = 1.1.2 =

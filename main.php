@@ -164,24 +164,24 @@ class Smarter_Navigation_Display {
 		return implode(" $sep ", $parts);
 	}
 
-	static function adjacent_post($format, $title, $previous = false, $fallback) {
+	static function adjacent_post($format, $title, $previous = false, $fallback, $in_same_cat = false, $excluded_categories = '') {
 		if ( !is_single() )
 			return false;
 
 		$id = self::get_adjacent_id($previous);
+
+		if ( false === $id )
+			return false;
 
 		if ( -1 == $id ) {
 			if ( !$fallback )
 				return false;
 
 			if ( $previous )
-				return previous_post_link($format, $title);
+				return previous_post_link($format, $title, $in_same_cat, $excluded_categories);
 			else
-				return next_post_link($format, $title);
+				return next_post_link($format, $title, $in_same_cat, $excluded_categories);
 		}
-
-		if ( false === $id )
-			return false;
 
 		$title = str_replace('%title', get_the_title($id), $title);
 		$link = sprintf("<a href='%s'>%s</a>", get_permalink($id), $title);
