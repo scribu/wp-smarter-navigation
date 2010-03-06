@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 Smarter_Navigation_Cookie::init();
 
 class Smarter_Navigation_Cookie {
-	const NAME = 'SN_DATA';
+	const NAME = 'smarter-navigation';
 	const SEP = '__SEP__';
 	const COUNT = 500;
 
@@ -56,8 +56,6 @@ class Smarter_Navigation_Cookie {
 	}
 
 	private function read_cookie() {
-#		debug_a('read', $_COOKIE[self::NAME]);
-
 		if ( empty($_COOKIE[self::NAME]) )
 			return false;
 
@@ -73,7 +71,6 @@ class Smarter_Navigation_Cookie {
 
 		if ( !in_array($posts[0]->ID, self::$data['ids']) )
 			self::$data = null;
-//			self::clear_cookie();	// cookie might still be useful
 	}
 
 	private function set_cookie() {
@@ -87,8 +84,6 @@ class Smarter_Navigation_Cookie {
 		$r = array();
 		foreach ( $data as $key => $value )
 			$r[self::get_name($key)] = setcookie(self::get_name($key), $value, 0, '/');
-
-#		debug_a('set', $r);
 	}
 
 	private function clear_cookie() {
@@ -97,8 +92,6 @@ class Smarter_Navigation_Cookie {
 
 		foreach ( array_keys($_COOKIE[self::NAME]) as $key )
 			setcookie(self::get_name($key), false, 0, '/');
-
-#		debug_a('clear');
 	}
 
 	private function get_name($key) {
@@ -153,7 +146,7 @@ class Smarter_Navigation_Display {
 	static function get_title($sep, $sepdir) {
 		$sep = trim($sep);
 
-		if ( ! $title = Smarter_Navigation_Cookie::$data['title'] )
+		if ( ! $title = @Smarter_Navigation_Cookie::$data['title'] )
 			$title = 'Referrer';
 
 		$parts = array_slice(explode(Smarter_Navigation_Cookie::SEP, $title), 1);
@@ -213,14 +206,5 @@ class Smarter_Navigation_Display {
 	}
 }
 
-include_once(dirname(__FILE__) . '/template-tags.php');
-
-function debug_a() {
-	if ( !current_user_can('administrator') )
-		return;
-
-	$args = func_get_args();
-
-	call_user_func_array('debug', $args);
-}
+include dirname(__FILE__) . '/template-tags.php';
 
