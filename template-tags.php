@@ -22,6 +22,24 @@ function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $
 	return Smarter_Navigation_Display::referrer_link($format, $title, $sep, $sepdirection);
 }
 
+// Retrieve the category, based on the referrer URL. Useful if you have posts with multiple categories
+function get_referrer_category() {
+	global $posts;
+
+	if ( ! $referrer_url = get_referrer_url() )
+		return false;
+
+	foreach ( get_the_category($posts[0]->ID) as $cat ) {
+		$cat_link = get_category_link($cat->term_id);
+
+		if ( false !== strpos($referrer_url, $cat_link) )
+			return $cat;
+	}
+
+	return false;
+}
+
+// Retrieve the full referrer URL
 function get_referrer_url() {
 	return @Smarter_Navigation_Cookie::$data['url'];
 }

@@ -3,7 +3,7 @@ Contributors: scribu
 Donate link: http://scribu.net/wordpress
 Tags: archive, navigation, next, previous, referrer
 Requires at least: 2.0
-Tested up to: 2.9.1
+Tested up to: 3.0
 Stable tag: 1.1.2
 
 Generates more specific previous / next post links based on referrer.
@@ -30,6 +30,8 @@ There is also a `referrer_link()` template tag which displays a link to the refe
 * $sep = '&amp;raquo;'
 * $seplocation = 'left'
 
+You can also use `get_referrer_url()` to check the referrer URL.
+
 You can learn more about these by looking at the template-tags.php file.
 
 == Installation ==
@@ -49,10 +51,9 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 == Changelog ==
 
 = 1.2 =
-* added get_referrer_url() template tag
-* added $in_same_cat and $excluded_categories arguments
 * moved to PHP5 syntax
-* set cookie on 'template_redirect'
+* added get_referrer_category() and get_referrer_url() template tags
+* added $in_same_cat and $excluded_categories arguments to previous_post_smart() & next_post_smart()
 
 = 1.1.2 =
 * added $fallback parameter to *_post_smart()

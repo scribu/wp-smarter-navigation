@@ -3,11 +3,11 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.2b
+Version: 1.2
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
-Copyright (C) 2009 scribu.net (scribu AT gmail DOT com)
+Copyright (C) 2010 scribu.net (scribu AT gmail DOT com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ class Smarter_Navigation_Display {
 		return implode(" $sep ", $parts);
 	}
 
-	static function adjacent_post($format, $title, $previous = false, $fallback, $in_same_cat = false, $excluded_categories = '') {
+	static function adjacent_post($format, $title, $previous, $fallback, $in_same_cat, $excluded_categories) {
 		if ( !is_single() )
 			return false;
 
