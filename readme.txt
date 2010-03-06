@@ -10,7 +10,7 @@ Generates more specific previous / next post links based on referrer.
 
 == Description ==
 
-**Version 1.2 requires PHP 5.**
+**PHP 5 is required since version 1.2.**
 
 The default `previous_post_link()` and `next_post_link()` have an option to restrict adjacent posts to the current category. This plugin takes it one step further:
 
