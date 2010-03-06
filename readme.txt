@@ -2,13 +2,15 @@
 Contributors: scribu
 Donate link: http://scribu.net/wordpress
 Tags: archive, navigation, next, previous, referrer
-Requires at least: 2.0
+Requires at least: 2.8
 Tested up to: 3.0
-Stable tag: 1.1.2
+Stable tag: trunk
 
 Generates more specific previous / next post links based on referrer.
 
 == Description ==
+
+**Version 1.2 requires PHP 5.**
 
 The default `previous_post_link()` and `next_post_link()` have an option to restrict adjacent posts to the current category. This plugin takes it one step further:
 
@@ -30,7 +32,7 @@ There is also a `referrer_link()` template tag which displays a link to the refe
 * $sep = '&amp;raquo;'
 * $seplocation = 'left'
 
-You can also use `get_referrer_category()` to retrieve the category object. This is useful when you have posts in multiple categories.
+You can also use `get_referrer_category()` to retrieve the category object, based on the referrer url. This is useful when you have posts in multiple categories.
 
 You can learn more about these by looking at the `template-tags.php` file.
 
@@ -54,6 +56,7 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 * moved to PHP5 syntax
 * added get_referrer_category() and get_referrer_url() template tags
 * added $in_same_cat and $excluded_categories arguments to previous_post_smart() & next_post_smart()
+* [more info](http://scribu.net/wordpress/smarter-navigation/sn-1-2.html)
 
 = 1.1.2 =
 * added $fallback parameter to *_post_smart()
