@@ -12,7 +12,7 @@ Generates more specific previous / next post links based on referrer.
 
 **PHP 5 is required since version 1.2.**
 
-When you're viewing a single post, you might want to display links to the previous and next post in the same category.
+When displaying a single post, you might want to show links to the previous and next posts in the same category.
 
 That's fine; WordPress let's you do this with `previous_post_link()` and `next_post_link()`.
 
