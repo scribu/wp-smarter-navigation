@@ -1,7 +1,7 @@
 === Smarter Navigation ===
 Contributors: scribu
 Donate link: http://scribu.net/wordpress
-Tags: archive, navigation, next, previous, referrer
+Tags: navigation, previous, next, referrer
 Requires at least: 2.8
 Tested up to: 3.0
 Stable tag: 1.2
@@ -12,35 +12,50 @@ Generates more specific previous / next post links based on referrer.
 
 **PHP 5 is required since version 1.2.**
 
-The default `previous_post_link()` and `next_post_link()` have an option to restrict adjacent posts to the current category. This plugin takes it one step further:
+When you're viewing a single post, you might want to display links to the previous and next post in the same category.
 
-If you visit an archive page (category, tag, date, author, search etc.) and then visit a single post from that page, the `previous_post_smart()` and `next_post_smart()` will point only to the other posts in that archive page.
+That's fine; WordPress let's you do this with `previous_post_link()` and `next_post_link()`.
 
-This is particularly useful for photoblogs (that’s where I use it).
+But what if that post is in multiple categories?
 
-= Template tags =
-You can simply replace `previous_post_link()` with `previous_post_smart()` and keep the first two arguments: $format & $title. 
+What if the user came to that post from a tag page or from an author page? Wouldn't it make more sense to display previous / next posts from that particular set?
 
-If there isn’t a previous post in a set, the normal template tag will be called.
+Well, you can do this with a similar pair of functions, provided by this plugin: `previous_post_smart()` and `next_post_smart()`.
 
-The same goes for `next_post_link()`.
+Here's how it works:
 
-There is also a `referrer_link()` template tag which displays a link to the referrer. Args:
+Whenever a visitor goes to an archive page (category, tag, date, author, search etc.), the plugin stores the list of post ids in a cookie.
 
-* $format = '%link'
-* $title = '%title'
-* $sep = '&amp;raquo;'
-* $seplocation = 'left'
-
-You can also use `get_referrer_category()` to retrieve the category object, based on the referrer url. This is useful when you have posts in multiple categories.
-
-You can learn more about these by looking at the `template-tags.php` file.
+Then, if the visitor goes to a single post from that archive page, the plugin generates the prev / next links based on the information in the cookie.
 
 == Installation ==
 
 1. Unzip the archive and put the folder into your plugins folder (/wp-content/plugins/).
 1. Activate the plugin from the Plugins admin menu.
-1. Insert the template tags in your theme as needed.
+
+= Basic usage =
+
+Go to your theme directoy and open single.php.
+
+Replace 
+
+`previous_post_link(` with `previous_post_smart(` 
+
+and
+
+`next_post_link(` with `next_post_smart(`
+
+= Referrer link =
+
+If you also want to display a link back to the list of posts, add this line (also in single.php):
+
+`<?php referrer_link(); ?>`
+
+= Posts with multiple categories =
+
+If you want for example to [higlight the category](http://wordpress.org/support/topic/366588) that the user came from, you can use `get_referrer_category()` to retrieve the category object.
+
+For further reference, all the template tags are located in [smarter-navigation/template-tags.php](http://plugins.trac.wordpress.org/browser/smarter-navigation/trunk/template-tags.php).
 
 == Frequently Asked Questions ==
 
