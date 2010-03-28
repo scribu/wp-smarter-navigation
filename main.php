@@ -45,7 +45,7 @@ class Smarter_Navigation_Cookie {
 		// Default conditions
 		$read_cond = is_single();
 		$clear_cond = is_home();
-		$set_cond = true;
+		$set_cond = !is_front_page();
 
 		if ( apply_filters('smarter_nav_read', $read_cond) )
 			self::read_cookie();
@@ -104,18 +104,14 @@ class Smarter_Navigation_Cookie {
 		$query = $wp_query->request;
 
 		// replace SELECT
-		$query = explode('FROM', $query, 2);
-		$query = "SELECT {$wpdb->posts}.ID FROM" . $query[1];
+		preg_match("/^\s*SELECT\s+.*?\s+FROM/i", $query, $matches);
+		$query = preg_replace("/^\s*SELECT\s+.*?\s+FROM/i", "SELECT {$wpdb->posts}.ID FROM", $query);
 
 		// replace LIMIT
-		// todo: make sure we're replacing the last LIMIT clause
-		$query = explode('LIMIT', $query, 2);
+		preg_match('/LIMIT\s+(\d+),\s+(\d+)\s*$/', $query, $matches);
+		list($limit, $start, $finish) = $matches;
 
 		$count = self::COUNT;
-
-		$limit = explode(',', $query[1]);
-		$start = (int) $limit[0];
-		$finish = (int) $limit[1];
 
 		$new_start = $start - $count/2 + ($finish - $start)/2;
 		if ( $new_start < 0 )
@@ -123,7 +119,7 @@ class Smarter_Navigation_Cookie {
 
 		$new_finish = $new_start + $count;
 
-		$query = $query[0] . "LIMIT $new_start, $new_finish";
+		$query = str_replace($limit, "LIMIT $new_start, $new_finish", $query);
 
 		return $wpdb->get_col($query);
 	}
