@@ -4,7 +4,7 @@ Donate link: http://scribu.net/wordpress
 Tags: navigation, previous, next, referrer
 Requires at least: 2.8
 Tested up to: 3.0
-Stable tag: 1.2
+Stable tag: 1.2.1
 
 Generates more specific previous / next post links based on referrer.
 
