@@ -129,7 +129,7 @@ class Smarter_Navigation_Cookie {
 		return $GLOBALS['posts'][0]->ID;
 	}
 
-	private static function get_current_url() {
+	static function get_current_url() {
 		$pageURL = ($_SERVER["HTTPS"] == "on") ? 'https://' : 'http://';
 
 		if ( $_SERVER["SERVER_PORT"] != "80" )
@@ -156,7 +156,10 @@ class Smarter_Navigation_Display {
 			return $base_url;
 
 		$current_id = Smarter_Navigation_Cookie::get_current_id();
+
 		list($initial_id, $base_page, $posts_per_page) = explode(' ', $tmp);
+		if ( !$base_page )
+			$base_page = 1;
 
 		if ( $current_id == $initial_id )
 			return $base_url;
@@ -166,18 +169,24 @@ class Smarter_Navigation_Display {
 		$i = array_search($initial_id, $ids);
 		$c = array_search($current_id, $ids);
 
-		$add = floor(($c-$i) / $posts_per_page);
+		$add = (int) floor(($c-$i) / $posts_per_page);
 
-		if ( $i > $c ) {
-
-		}
+		if ( !$add )
+			return $base_url;
 
 		$new_page = $base_page + $add;
 
-		if ( $wp_rewrite->using_permalinks() )
-			$adjusted_url = str_replace("/page/$base_page", "/page/$new_page", $base_url);
-		else
-			$adjusted_url = add_query_arg('paged', $new_page, $base_url);
+		if ( $wp_rewrite->using_permalinks() ) {
+			$base_url = str_replace("/page/$base_page", '', $base_url);
+			$adjusted_url = get_pagenum_link($new_page);
+			$adjusted_url = str_replace(Smarter_Navigation_Cookie::get_current_url(), $base_url, $adjusted_url);
+		}
+		else {
+			if ( $new_page > 1 )
+				$adjusted_url = add_query_arg('paged', $new_page, $base_url);
+			else
+				$adjusted_url = remove_query_arg('paged', $base_url);
+		}
 
 		return $adjusted_url;
 	}
@@ -185,7 +194,7 @@ class Smarter_Navigation_Display {
 	static function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left') {
 		$url = self::get_referrer_url();
 
-		if ( !is_single() or empty($url) )
+		if ( !is_single() || empty($url) )
 			return false;
 
 		$title = str_replace('%title', self::get_title($sep, $sepdirection), $title);
