@@ -26,7 +26,7 @@ function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $
 function get_referrer_category() {
 	global $posts;
 
-	if ( ! $referrer_url = get_referrer_url() )
+	if ( ! $referrer_url = get_referrer_url(false) )
 		return false;
 
 	foreach ( get_the_category($posts[0]->ID) as $cat ) {
@@ -40,7 +40,7 @@ function get_referrer_category() {
 }
 
 // Retrieve the full referrer URL
-function get_referrer_url() {
-	return @Smarter_Navigation_Cookie::$data['url'];
+function get_referrer_url($adjusting = true) {
+	return Smarter_Navigation_Display::get_referrer_url($adjusting);
 }
 
