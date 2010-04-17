@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.2.2a
+Version: 1.3a
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -23,9 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-Smarter_Navigation_Cookie::init();
-
-class Smarter_Navigation_Cookie {
+class Smarter_Navigation {
 	const NAME = 'smarter-navigation';
 	const SEP = '__SEP__';
 	const COUNT = 500;
@@ -40,6 +38,7 @@ class Smarter_Navigation_Cookie {
 	function init() {
 		add_action('template_redirect', array(__CLASS__, 'manage_cookie'));
 	}
+
 
 	function manage_cookie() {
 		// Default conditions
@@ -125,37 +124,29 @@ class Smarter_Navigation_Cookie {
 	}
 
 
-	static function get_current_id() {
-		return $GLOBALS['posts'][0]->ID;
+	static function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left') {
+		$url = self::get_referrer_url();
+
+		if ( !is_single() || empty($url) )
+			return false;
+
+		$title = str_replace('%title', self::get_title($sep, $sepdirection), $title);
+		$link = sprintf("<a href='%s'>%s</a>", $url, $title);
+		echo str_replace('%link', $link, $format);
 	}
-
-	static function get_current_url() {
-		$pageURL = ($_SERVER["HTTPS"] == "on") ? 'https://' : 'http://';
-
-		if ( $_SERVER["SERVER_PORT"] != "80" )
-			$pageURL .= $_SERVER["SERVER_NAME"]. ":" .$_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
-		else
-			$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-
-		return $pageURL;
-	}
-}
-
-
-class Smarter_Navigation_Display {
 
 	static function get_referrer_url($adjusting = true) {
 		global $wp_rewrite;
 	
-		$base_url = @Smarter_Navigation_Cookie::$data['url'];
+		$base_url = @self::$data['url'];
 
 		if ( !$adjusting || !$base_url )
 			return $base_url;
 
-		if ( ! $tmp = @Smarter_Navigation_Cookie::$data['paging'] )
+		if ( ! $tmp = @self::$data['paging'] )
 			return $base_url;
 
-		$current_id = Smarter_Navigation_Cookie::get_current_id();
+		$current_id = self::get_current_id();
 
 		list($initial_id, $base_page, $posts_per_page) = explode(' ', $tmp);
 		if ( !$base_page )
@@ -164,7 +155,7 @@ class Smarter_Navigation_Display {
 		if ( $current_id == $initial_id )
 			return $base_url;
 
-		$ids = @Smarter_Navigation_Cookie::$data['ids'];
+		$ids = @self::$data['ids'];
 
 		$i = array_search($initial_id, $ids);
 		$c = array_search($current_id, $ids);
@@ -179,7 +170,7 @@ class Smarter_Navigation_Display {
 		if ( $wp_rewrite->using_permalinks() ) {
 			$base_url = str_replace("/page/$base_page", '', $base_url);
 			$adjusted_url = get_pagenum_link($new_page);
-			$adjusted_url = str_replace(Smarter_Navigation_Cookie::get_current_url(), $base_url, $adjusted_url);
+			$adjusted_url = str_replace(self::get_current_url(), $base_url, $adjusted_url);
 		}
 		else {
 			if ( $new_page > 1 )
@@ -191,31 +182,20 @@ class Smarter_Navigation_Display {
 		return $adjusted_url;
 	}
 
-	static function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left') {
-		$url = self::get_referrer_url();
-
-		if ( !is_single() || empty($url) )
-			return false;
-
-		$title = str_replace('%title', self::get_title($sep, $sepdirection), $title);
-		$link = sprintf("<a href='%s'>%s</a>", $url, $title);
-		echo str_replace('%link', $link, $format);
-	}
-
-
 	static function get_title($sep, $sepdir) {
 		$sep = trim($sep);
 
-		if ( ! $title = @Smarter_Navigation_Cookie::$data['title'] )
+		if ( ! $title = @self::$data['title'] )
 			$title = 'Referrer';
 
-		$parts = array_slice(explode(Smarter_Navigation_Cookie::SEP, $title), 1);
+		$parts = array_slice(explode(self::SEP, $title), 1);
 
 		if ( 'right' == $sepdir )
 			$parts = array_reverse($parts);
 
 		return implode(" $sep ", $parts);
 	}
+
 
 	static function adjacent_post($format, $title, $previous, $fallback, $in_same_cat, $excluded_categories) {
 		if ( !is_single() )
@@ -244,7 +224,7 @@ class Smarter_Navigation_Display {
 	static function get_adjacent_id($previous = false) {
 		global $post;
 
-		if ( ! $ids = @array_reverse(Smarter_Navigation_Cookie::$data['ids']) )
+		if ( ! $ids = @array_reverse(self::$data['ids']) )
 			return -1;	// no data
 
 		$pos = array_search($post->ID, $ids);
@@ -264,7 +244,24 @@ class Smarter_Navigation_Display {
 
 		return $id;
 	}
+
+
+	private static function get_current_id() {
+		return $GLOBALS['posts'][0]->ID;
+	}
+
+	private static function get_current_url() {
+		$pageURL = ($_SERVER["HTTPS"] == "on") ? 'https://' : 'http://';
+
+		if ( $_SERVER["SERVER_PORT"] != "80" )
+			$pageURL .= $_SERVER["SERVER_NAME"]. ":" .$_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
+		else
+			$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+
+		return $pageURL;
+	}
 }
+Smarter_Navigation::init();
 
 include dirname(__FILE__) . '/template-tags.php';
 
