@@ -124,6 +124,55 @@ class Smarter_Navigation {
 	}
 
 
+	static function adjacent_post($format, $title, $previous, $fallback, $in_same_cat, $excluded_categories) {
+		if ( !is_single() )
+			return false;
+
+		$id = self::get_adjacent_id($previous);
+
+		if ( false === $id )
+			return false;
+
+		if ( -1 == $id ) {
+			if ( !$fallback )
+				return false;
+
+			if ( $previous )
+				return previous_post_link($format, $title, $in_same_cat, $excluded_categories);
+			else
+				return next_post_link($format, $title, $in_same_cat, $excluded_categories);
+		}
+
+		$title = str_replace('%title', get_the_title($id), $title);
+		$link = sprintf("<a href='%s'>%s</a>", get_permalink($id), $title);
+		echo str_replace('%link', $link, $format);
+	}
+
+	static function get_adjacent_id($previous = false) {
+		global $post;
+
+		if ( ! $ids = @array_reverse(self::$data['ids']) )
+			return -1;	// no data
+
+		$pos = array_search($post->ID, $ids);
+
+		// Get adjacent id
+		if ( $previous ) {
+			if ( 0 === $pos )
+				return false;
+
+			$id = $ids[$pos - 1];
+		} else {
+			if ( count($ids) - 1 === $pos )
+				return false;
+
+			$id = $ids[$pos + 1];
+		}
+
+		return $id;
+	}
+
+
 	static function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left') {
 		$url = self::get_referrer_url();
 
@@ -135,13 +184,13 @@ class Smarter_Navigation {
 		echo str_replace('%link', $link, $format);
 	}
 
-	static function get_referrer_url($adjusting = true) {
+	static function get_referrer_url() {
 		global $wp_rewrite;
 	
 		$base_url = @self::$data['url'];
 
-		if ( !$adjusting || !$base_url )
-			return $base_url;
+		if ( !$base_url )
+			return '';
 
 		if ( ! $tmp = @self::$data['paging'] )
 			return $base_url;
@@ -194,55 +243,6 @@ class Smarter_Navigation {
 			$parts = array_reverse($parts);
 
 		return implode(" $sep ", $parts);
-	}
-
-
-	static function adjacent_post($format, $title, $previous, $fallback, $in_same_cat, $excluded_categories) {
-		if ( !is_single() )
-			return false;
-
-		$id = self::get_adjacent_id($previous);
-
-		if ( false === $id )
-			return false;
-
-		if ( -1 == $id ) {
-			if ( !$fallback )
-				return false;
-
-			if ( $previous )
-				return previous_post_link($format, $title, $in_same_cat, $excluded_categories);
-			else
-				return next_post_link($format, $title, $in_same_cat, $excluded_categories);
-		}
-
-		$title = str_replace('%title', get_the_title($id), $title);
-		$link = sprintf("<a href='%s'>%s</a>", get_permalink($id), $title);
-		echo str_replace('%link', $link, $format);
-	}
-
-	static function get_adjacent_id($previous = false) {
-		global $post;
-
-		if ( ! $ids = @array_reverse(self::$data['ids']) )
-			return -1;	// no data
-
-		$pos = array_search($post->ID, $ids);
-
-		// Get adjacent id
-		if ( $previous ) {
-			if ( 0 === $pos )
-				return false;
-
-			$id = $ids[$pos - 1];
-		} else {
-			if ( count($ids) - 1 === $pos )
-				return false;
-
-			$id = $ids[$pos + 1];
-		}
-
-		return $id;
 	}
 
 

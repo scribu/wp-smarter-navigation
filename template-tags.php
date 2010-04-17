@@ -40,7 +40,7 @@ function get_referrer_category() {
 }
 
 // Retrieve the full referrer URL
-function get_referrer_url($adjusting = true) {
-	return Smarter_Navigation::get_referrer_url($adjusting);
+function get_referrer_url() {
+	return Smarter_Navigation::get_referrer_url();
 }
 
