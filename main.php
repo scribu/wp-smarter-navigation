@@ -108,8 +108,16 @@ class Smarter_Navigation_Cookie {
 		$query = preg_replace("/^\s*SELECT\s+.*?\s+FROM/i", "SELECT {$wpdb->posts}.ID FROM", $query);
 
 		// replace LIMIT
-		preg_match('/LIMIT\s+(\d+),\s+(\d+)\s*$/', $query, $matches);
-		list($limit, $start, $finish) = $matches;
+		preg_match('/LIMIT\s+(\d+)(,\s+(\d+))?\s*$/', $query, $matches);
+		$limit = $matches[0];
+		if ( 2 == count($matches) ) {
+			$start = 0;
+			$finish = $matches[1];
+		}
+		else {
+			$start = $matches[1];
+			$finish = $matches[3];
+		}
 
 		$count = self::COUNT;
 
