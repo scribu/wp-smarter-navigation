@@ -67,7 +67,7 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 
 == Changelog ==
 
-= 1.2.2 =
+= 1.3 =
 * adjusting referrer URL
 
 = 1.2.1 =

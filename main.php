@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.3a
+Version: 1.3-alpha
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -65,19 +65,21 @@ class Smarter_Navigation {
 			self::$data = null;
 	}
 
-	private function set_cookie() {
-		$data = array(
-			'ids' => implode(' ', self::collect_ids()),
-			'url' => self::get_current_url(),
-			'paging' => implode(' ', array(self::get_current_id(), get_query_var('paged'), get_query_var('posts_per_page'))),
-			'title' => trim(wp_title(self::SEP, false, 'left')),
-		);
+	public function set_cookie($data = '') {
+		if ( !$data ) {
+			$data = array(
+				'ids' => implode(' ', self::collect_ids()),
+				'url' => self::get_current_url(),
+				'paging' => implode(' ', array(self::get_current_id(), get_query_var('paged'), get_query_var('posts_per_page'))),
+				'title' => trim(wp_title(self::SEP, false, 'left')),
+			);
+		}
 
 		foreach ( $data as $key => $value )
 			setcookie(self::get_name($key), $value, 0, '/');
 	}
 
-	private function clear_cookie() {
+	public function clear_cookie() {
 		if ( empty($_COOKIE[self::NAME]) )
 			return;
 
