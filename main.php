@@ -66,17 +66,17 @@ class Smarter_Navigation {
 	}
 
 	public function set_cookie($data = '') {
-		if ( !$data ) {
-			$data = array(
-				'ids' => implode(' ', self::collect_ids()),
-				'url' => self::get_current_url(),
-				'paging' => implode(' ', array(self::get_current_id(), get_query_var('paged'), get_query_var('posts_per_page'))),
-				'title' => trim(wp_title(self::SEP, false, 'left')),
-			);
-		}
+		$defaults = array(
+			'ids' => implode(' ', self::collect_ids()),
+			'url' => self::get_current_url(),
+			'paging' => implode(' ', array(self::get_current_id(), get_query_var('paged'), get_query_var('posts_per_page'))),
+			'title' => trim(wp_title(self::SEP, false, 'left')),
+		);
 
-		foreach ( $data as $key => $value )
-			setcookie(self::get_name($key), $value, 0, '/');
+		$data = wp_parse_args($data, $defaults);
+
+		foreach ( array_keys($defaults) as $key )
+			setcookie(self::get_name($key), $data[$key], 0, '/');
 	}
 
 	public function clear_cookie() {
