@@ -39,19 +39,20 @@ class Smarter_Navigation {
 		add_action('template_redirect', array(__CLASS__, 'manage_cookie'));
 	}
 
-
 	function manage_cookie() {
 		// Default conditions
-		$read_cond = is_single();
 		$clear_cond = is_home();
 		$set_cond = !is_404() && !is_singular();
+		$read_cond = is_singular();
+
+		if ( apply_filters('smarter_nav_clear', $clear_cond) )
+			self::clear_cookie();
+		
+		if ( apply_filters('smarter_nav_set', $set_cond) )
+			self::set_cookie();
 
 		if ( apply_filters('smarter_nav_read', $read_cond) )
 			self::read_cookie();
-		elseif ( apply_filters('smarter_nav_clear', $clear_cond) )
-			self::clear_cookie();
-		elseif ( apply_filters('smarter_nav_set', $set_cond) )
-			self::set_cookie();
 	}
 
 	private function read_cookie() {
