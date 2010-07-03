@@ -152,7 +152,7 @@ class Smarter_Navigation {
 	static function get_adjacent_id($previous = false) {
 		global $post;
 
-		if ( ! $ids = @array_reverse(self::$data['ids']) )
+		if ( ! $ids = array_reverse((array) self::$data['ids']) )
 			return -1;	// no data
 
 		$pos = array_search($post->ID, $ids);
