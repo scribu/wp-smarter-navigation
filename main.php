@@ -7,12 +7,12 @@ Version: 1.3-alpha2
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
-Copyright (C) 2010 scribu.net (scribu AT gmail DOT com)
+Copyright ( C ) 2010 scribu.net ( scribu AT gmail DOT com )
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
-(at your option) any later version.
+( at your option ) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,7 @@ class Smarter_Navigation {
 	);
 
 	function init() {
-		add_action('template_redirect', array(__CLASS__, 'manage_cookie'));
+		add_action( 'template_redirect', array( __CLASS__, 'manage_cookie' ) );
 	}
 
 	function manage_cookie() {
@@ -45,48 +45,48 @@ class Smarter_Navigation {
 		$set_cond = !is_404();
 		$read_cond = is_singular();
 
-		if ( apply_filters('smarter_nav_clear', $clear_cond) )
+		if ( apply_filters( 'smarter_nav_clear', $clear_cond ) )
 			self::clear_cookie();
-		elseif ( apply_filters('smarter_nav_set', $set_cond) )
+		elseif ( apply_filters( 'smarter_nav_set', $set_cond ) )
 			self::set_cookie();
-		elseif ( apply_filters('smarter_nav_read', $read_cond) )
+		elseif ( apply_filters( 'smarter_nav_read', $read_cond ) )
 			self::read_cookie();
 	}
 
 	private function read_cookie() {
-		if ( empty($_COOKIE[self::NAME]) )
+		if ( empty( $_COOKIE[self::NAME] ) )
 			return false;
 
 		self::$data = $_COOKIE[self::NAME];
-		self::$data['ids'] = explode(' ', self::$data['ids']);
+		self::$data['ids'] = explode( ' ', self::$data['ids'] );
 
-		if ( !in_array(self::get_current_id(), self::$data['ids']) )
+		if ( !in_array( self::get_current_id(), self::$data['ids'] ) )
 			self::$data = null;
 	}
 
-	public function set_cookie($data = '') {
+	public function set_cookie( $data = '' ) {
 		$defaults = array(
-			'ids' => implode(' ', self::collect_ids()),
+			'ids' => implode( ' ', self::collect_ids() ),
 			'url' => self::get_current_url(),
-			'paging' => implode(' ', array(self::get_current_id(), get_query_var('paged'), get_query_var('posts_per_page'))),
-			'title' => trim(wp_title(self::SEP, false, 'left')),
+			'paging' => implode( ' ', array( self::get_current_id(), get_query_var( 'paged' ), get_query_var( 'posts_per_page' ) ) ),
+			'title' => trim( wp_title( self::SEP, false, 'left' ) ),
 		);
 
-		$data = wp_parse_args($data, $defaults);
+		$data = wp_parse_args( $data, $defaults );
 
-		foreach ( array_keys($defaults) as $key )
-			setcookie(self::get_name($key), $data[$key], 0, '/');
+		foreach ( array_keys( $defaults ) as $key )
+			setcookie( self::get_name( $key ), $data[$key], 0, '/' );
 	}
 
 	public function clear_cookie() {
-		if ( empty($_COOKIE[self::NAME]) )
+		if ( empty( $_COOKIE[self::NAME] ) )
 			return;
 
-		foreach ( array_keys($_COOKIE[self::NAME]) as $key )
-			setcookie(self::get_name($key), false, 0, '/');
+		foreach ( array_keys( $_COOKIE[self::NAME] ) as $key )
+			setcookie( self::get_name( $key ), false, 0, '/' );
 	}
 
-	private function get_name($key) {
+	private function get_name( $key ) {
 		return self::NAME . '[' . $key . ']';
 	}
 
@@ -96,13 +96,13 @@ class Smarter_Navigation {
 		$query = $wp_query->request;
 
 		// replace SELECT
-		preg_match("/^\s*SELECT\s+.*?\s+FROM/i", $query, $matches);
-		$query = preg_replace("/^\s*SELECT\s+.*?\s+FROM/i", "SELECT {$wpdb->posts}.ID FROM", $query);
+		preg_match( "/^\s*SELECT\s+.*?\s+FROM/i", $query, $matches );
+		$query = preg_replace( "/^\s*SELECT\s+.*?\s+FROM/i", "SELECT {$wpdb->posts}.ID FROM", $query );
 
 		// replace LIMIT
-		preg_match('/LIMIT\s+(\d+)(,\s+(\d+))?\s*$/', $query, $matches);
+		preg_match( '/LIMIT\s+(\d+)(,\s+(\d+))?\s*$/', $query, $matches );
 		$limit = $matches[0];
-		if ( 2 == count($matches) ) {
+		if ( 2 == count( $matches ) ) {
 			$start = 0;
 			$finish = $matches[1];
 		}
@@ -113,23 +113,23 @@ class Smarter_Navigation {
 
 		$count = self::COUNT;
 
-		$new_start = $start - $count/2 + ($finish - $start)/2;
+		$new_start = $start - $count/2 + ( $finish - $start )/2;
 		if ( $new_start < 0 )
 			$new_start = 0;
 
 		$new_finish = $new_start + $count;
 
-		$query = str_replace($limit, "LIMIT $new_start, $new_finish", $query);
+		$query = str_replace( $limit, "LIMIT $new_start, $new_finish", $query );
 
-		return $wpdb->get_col($query);
+		return $wpdb->get_col( $query );
 	}
 
 
-	static function adjacent_post($format, $title, $previous, $fallback, $in_same_cat, $excluded_categories) {
+	static function adjacent_post( $format, $title, $previous, $fallback, $in_same_cat, $excluded_categories ) {
 		if ( !is_single() )
 			return false;
 
-		$id = self::get_adjacent_id($previous);
+		$id = self::get_adjacent_id( $previous );
 
 		if ( false === $id )
 			return false;
@@ -139,23 +139,23 @@ class Smarter_Navigation {
 				return false;
 
 			if ( $previous )
-				return previous_post_link($format, $title, $in_same_cat, $excluded_categories);
+				return previous_post_link( $format, $title, $in_same_cat, $excluded_categories );
 			else
-				return next_post_link($format, $title, $in_same_cat, $excluded_categories);
+				return next_post_link( $format, $title, $in_same_cat, $excluded_categories );
 		}
 
-		$title = str_replace('%title', get_the_title($id), $title);
-		$link = sprintf("<a href='%s'>%s</a>", get_permalink($id), $title);
-		echo str_replace('%link', $link, $format);
+		$title = str_replace( '%title', get_the_title( $id ), $title );
+		$link = sprintf( "<a href='%s'>%s</a>", get_permalink( $id ), $title );
+		echo str_replace( '%link', $link, $format );
 	}
 
-	static function get_adjacent_id($previous = false) {
+	static function get_adjacent_id( $previous = false ) {
 		global $post;
 
-		if ( ! $ids = array_reverse((array) self::$data['ids']) )
+		if ( ! $ids = array_reverse( (array) self::$data['ids'] ) )
 			return -1;	// no data
 
-		$pos = array_search($post->ID, $ids);
+		$pos = array_search( $post->ID, $ids );
 
 		// Get adjacent id
 		if ( $previous ) {
@@ -164,7 +164,7 @@ class Smarter_Navigation {
 
 			$id = $ids[$pos - 1];
 		} else {
-			if ( count($ids) - 1 === $pos )
+			if ( count( $ids ) - 1 === $pos )
 				return false;
 
 			$id = $ids[$pos + 1];
@@ -174,20 +174,20 @@ class Smarter_Navigation {
 	}
 
 
-	static function referrer_link($format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left') {
+	static function referrer_link( $format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left' ) {
 		$url = self::get_referrer_url();
 
-		if ( !is_single() || empty($url) )
+		if ( !is_single() || empty( $url ) )
 			return false;
 
-		$title = str_replace('%title', self::get_title($sep, $sepdirection), $title);
-		$link = sprintf("<a href='%s'>%s</a>", $url, $title);
-		echo str_replace('%link', $link, $format);
+		$title = str_replace( '%title', self::get_title( $sep, $sepdirection ), $title );
+		$link = sprintf( "<a href='%s'>%s</a>", $url, $title );
+		echo str_replace( '%link', $link, $format );
 	}
 
 	static function get_referrer_url() {
 		global $wp_rewrite;
-	
+
 		$base_url = @self::$data['url'];
 
 		if ( !$base_url )
@@ -198,7 +198,7 @@ class Smarter_Navigation {
 
 		$current_id = self::get_current_id();
 
-		list($initial_id, $base_page, $posts_per_page) = explode(' ', $tmp);
+		list( $initial_id, $base_page, $posts_per_page ) = explode( ' ', $tmp );
 		if ( !$base_page )
 			$base_page = 1;
 
@@ -207,10 +207,10 @@ class Smarter_Navigation {
 
 		$ids = @self::$data['ids'];
 
-		$i = array_search($initial_id, $ids);
-		$c = array_search($current_id, $ids);
+		$i = array_search( $initial_id, $ids );
+		$c = array_search( $current_id, $ids );
 
-		$add = (int) floor(($c-$i) / $posts_per_page);
+		$add = (int) floor( ( $c-$i ) / $posts_per_page );
 
 		if ( !$add )
 			return $base_url;
@@ -218,32 +218,32 @@ class Smarter_Navigation {
 		$new_page = $base_page + $add;
 
 		if ( $wp_rewrite->using_permalinks() ) {
-			$base_url = str_replace("/page/$base_page", '', $base_url);
-			$adjusted_url = get_pagenum_link($new_page);
-			$adjusted_url = str_replace(self::get_current_url(), $base_url, $adjusted_url);
+			$base_url = str_replace( "/page/$base_page", '', $base_url );
+			$adjusted_url = get_pagenum_link( $new_page );
+			$adjusted_url = str_replace( self::get_current_url(), $base_url, $adjusted_url );
 		}
 		else {
 			if ( $new_page > 1 )
-				$adjusted_url = add_query_arg('paged', $new_page, $base_url);
+				$adjusted_url = add_query_arg( 'paged', $new_page, $base_url );
 			else
-				$adjusted_url = remove_query_arg('paged', $base_url);
+				$adjusted_url = remove_query_arg( 'paged', $base_url );
 		}
 
 		return $adjusted_url;
 	}
 
-	static function get_title($sep, $sepdir) {
-		$sep = trim($sep);
+	static function get_title( $sep, $sepdir ) {
+		$sep = trim( $sep );
 
 		if ( ! $title = @self::$data['title'] )
 			$title = 'Referrer';
 
-		$parts = array_slice(explode(self::SEP, $title), 1);
+		$parts = array_slice( explode( self::SEP, $title ), 1 );
 
 		if ( 'right' == $sepdir )
-			$parts = array_reverse($parts);
+			$parts = array_reverse( $parts );
 
-		return implode(" $sep ", $parts);
+		return implode( " $sep ", $parts );
 	}
 
 
@@ -252,7 +252,7 @@ class Smarter_Navigation {
 	}
 
 	private static function get_current_url() {
-		$pageURL = ($_SERVER["HTTPS"] == "on") ? 'https://' : 'http://';
+		$pageURL = ( $_SERVER["HTTPS"] == "on" ) ? 'https://' : 'http://';
 
 		if ( $_SERVER["SERVER_PORT"] != "80" )
 			$pageURL .= $_SERVER["SERVER_NAME"]. ":" .$_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
@@ -264,5 +264,5 @@ class Smarter_Navigation {
 }
 Smarter_Navigation::init();
 
-include dirname(__FILE__) . '/template-tags.php';
+include dirname( __FILE__ ) . '/template-tags.php';
 
