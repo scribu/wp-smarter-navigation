@@ -1,6 +1,6 @@
 === Smarter Navigation ===
 Contributors: scribu
-Donate link: http://scribu.net/wordpress
+Donate link: http://scribu.net/paypal
 Tags: navigation, previous, next, referrer
 Requires at least: 2.8
 Tested up to: 3.0
@@ -9,8 +9,6 @@ Stable tag: 1.2.1
 Generates more specific previous / next post links based on referrer.
 
 == Description ==
-
-**PHP 5 is required since version 1.2.**
 
 When displaying a single post, you might want to show links to the previous and next posts in the same category.
 
@@ -27,6 +25,8 @@ Here's how it works:
 Whenever a visitor goes to an archive page (category, tag, date, author, search etc.), the plugin stores the list of post ids in a cookie.
 
 Then, if the visitor goes to a single post from that archive page, the plugin generates the prev / next links based on the information in the cookie.
+
+Links: [Plugin News](http://scribu.net/wordpress/smarter-navigation) | [Author's Site](http://scribu.net)
 
 == Installation ==
 
