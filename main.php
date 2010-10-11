@@ -7,7 +7,8 @@ Version: 1.3-alpha2
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
-Copyright ( C ) 2010 scribu.net ( scribu AT gmail DOT com )
+
+Copyright (C) 2010 Cristi Burcă (scribu@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,15 +43,15 @@ class Smarter_Navigation {
 	function manage_cookie() {
 		// Default conditions
 		$clear_cond = is_home();
-		$set_cond = !is_404();
 		$read_cond = is_singular();
+		$set_cond = !is_404();
 
 		if ( apply_filters( 'smarter_nav_clear', $clear_cond ) )
 			self::clear_cookie();
-		elseif ( apply_filters( 'smarter_nav_set', $set_cond ) )
-			self::set_cookie();
 		elseif ( apply_filters( 'smarter_nav_read', $read_cond ) )
 			self::read_cookie();
+		elseif ( apply_filters( 'smarter_nav_set', $set_cond ) )
+			self::set_cookie();
 	}
 
 	private function read_cookie() {
@@ -58,10 +59,13 @@ class Smarter_Navigation {
 			return false;
 
 		self::$data = $_COOKIE[self::NAME];
-		self::$data['ids'] = explode( ' ', self::$data['ids'] );
 
-		if ( !in_array( self::get_current_id(), self::$data['ids'] ) )
-			self::$data = null;
+		if ( !empty( self::$data['ids'] ) ) {
+			self::$data['ids'] = explode( ' ', self::$data['ids'] );
+
+			if ( !in_array( self::get_current_id(), self::$data['ids'] ) )
+				self::$data = null;
+		}
 	}
 
 	public function set_cookie( $data = '' ) {
@@ -100,7 +104,9 @@ class Smarter_Navigation {
 		$query = preg_replace( "/^\s*SELECT\s+.*?\s+FROM/i", "SELECT {$wpdb->posts}.ID FROM", $query );
 
 		// replace LIMIT
-		preg_match( '/LIMIT\s+(\d+)(,\s+(\d+))?\s*$/', $query, $matches );
+		if ( !preg_match( '/LIMIT\s+(\d+)(,\s+(\d+))?\s*$/', $query, $matches ) )
+			return array();
+
 		$limit = $matches[0];
 		if ( 2 == count( $matches ) ) {
 			$start = 0;
@@ -152,8 +158,10 @@ class Smarter_Navigation {
 	static function get_adjacent_id( $previous = false ) {
 		global $post;
 
-		if ( ! $ids = array_reverse( (array) self::$data['ids'] ) )
+		if ( empty( self::$data['ids'] ) )
 			return -1;	// no data
+
+		$ids = array_reverse( self::$data['ids'] );
 
 		$pos = array_search( $post->ID, $ids );
 
@@ -252,7 +260,7 @@ class Smarter_Navigation {
 	}
 
 	private static function get_current_url() {
-		$pageURL = ( $_SERVER["HTTPS"] == "on" ) ? 'https://' : 'http://';
+		$pageURL = is_ssl() ? 'https://' : 'http://';
 
 		if ( $_SERVER["SERVER_PORT"] != "80" )
 			$pageURL .= $_SERVER["SERVER_NAME"]. ":" .$_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
