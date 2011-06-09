@@ -196,10 +196,10 @@ class Smarter_Navigation {
 	static function get_referrer_url() {
 		global $wp_rewrite;
 
-		$base_url = @self::$data['url'];
-
-		if ( !$base_url )
+		if ( !isset( self::$data['url'] ) || !isset( self::$data['ids'] ) )
 			return '';
+
+		$base_url = self::$data['url'];
 
 		if ( ! $tmp = @self::$data['paging'] )
 			return $base_url;
@@ -213,7 +213,7 @@ class Smarter_Navigation {
 		if ( $current_id == $initial_id )
 			return $base_url;
 
-		$ids = @self::$data['ids'];
+		$ids = self::$data['ids'];
 
 		$i = array_search( $initial_id, $ids );
 		$c = array_search( $current_id, $ids );
