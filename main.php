@@ -125,8 +125,9 @@ class Smarter_Navigation {
 		if ( !isset( self::$cache[$previous] ) ) {
 			$args = array_merge( self::$data['query'], array(
 				'smarter_navigation' => $previous ? '<' : '>',
+				'order' => $previous ? 'DESC' : 'ASC',
 				'ignore_sticky_posts' => true,
-				'posts_per_page' => 1,
+				'nopaging' => true,
 			) );
 
 			$q = new WP_Query( $args );
@@ -155,6 +156,7 @@ class Smarter_Navigation {
 
 		if ( isset( $post->$field ) ) {
 			$bits['where'] .= $wpdb->prepare( " AND $orderby $direction %s ", $post->$field );
+			$bits['limits'] = 'LIMIT 1';
 		} else {
 			$bits['where'] = ' AND 1 = 0';
 		}
@@ -176,48 +178,10 @@ class Smarter_Navigation {
 	static function get_referrer_url() {
 		global $wp_rewrite;
 
-		if ( !isset( self::$data['url'] ) || !isset( self::$data['ids'] ) )
+		if ( !isset( self::$data['url'] ) || !isset( self::$data['query'] ) )
 			return '';
 
-		$base_url = self::$data['url'];
-
-		if ( ! $tmp = @self::$data['paging'] )
-			return $base_url;
-
-		$current_id = self::get_current_id();
-
-		list( $initial_id, $base_page, $posts_per_page ) = explode( ' ', $tmp );
-		if ( !$base_page )
-			$base_page = 1;
-
-		if ( $current_id == $initial_id )
-			return $base_url;
-
-		$ids = self::$data['ids'];
-
-		$i = array_search( $initial_id, $ids );
-		$c = array_search( $current_id, $ids );
-
-		$add = (int) floor( ( $c-$i ) / $posts_per_page );
-
-		if ( !$add )
-			return $base_url;
-
-		$new_page = $base_page + $add;
-
-		if ( $wp_rewrite->using_permalinks() ) {
-			$base_url = str_replace( "/page/$base_page", '', $base_url );
-			$adjusted_url = get_pagenum_link( $new_page );
-			$adjusted_url = str_replace( self::get_current_url(), $base_url, $adjusted_url );
-		}
-		else {
-			if ( $new_page > 1 )
-				$adjusted_url = add_query_arg( 'paged', $new_page, $base_url );
-			else
-				$adjusted_url = remove_query_arg( 'paged', $base_url );
-		}
-
-		return $adjusted_url;
+		return self::$data['url'];
 	}
 
 	static function get_title( $sep, $sepdir ) {
