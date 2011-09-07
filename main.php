@@ -8,7 +8,7 @@ Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
 
-Copyright (C) 2010 Cristi Burcă (scribu@gmail.com)
+Copyright (C) 2010-2011 Cristi Burcă (scribu@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 class Smarter_Navigation {
 	const NAME = 'smarter-navigation';
 	const SEP = '__SEP__';
-	const COUNT = 500;
 
 	static $data = array(
 		'ids' => '',
@@ -38,6 +37,7 @@ class Smarter_Navigation {
 
 	function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'manage_cookie' ) );
+		add_action( 'posts_clauses', array( __CLASS__, 'posts_clauses' ), 10, 2 );
 	}
 
 	function manage_cookie() {
@@ -60,26 +60,19 @@ class Smarter_Navigation {
 
 		self::$data = $_COOKIE[self::NAME];
 
-		if ( !empty( self::$data['ids'] ) ) {
-			self::$data['ids'] = explode( ' ', self::$data['ids'] );
-
-			if ( !in_array( self::get_current_id(), self::$data['ids'] ) )
-				self::$data = null;
-		}
+		if ( isset( self::$data['query'] ) )
+			self::$data['query'] = json_decode( stripslashes( self::$data['query'] ), true );
 	}
 
 	public function set_cookie( $data = '' ) {
-		$defaults = array(
-			'ids' => implode( ' ', self::collect_ids() ),
+		$data = wp_parse_args( $data, array(
+			'query' => json_encode( $GLOBALS['wp_query']->query ),
 			'url' => self::get_current_url(),
-			'paging' => implode( ' ', array( self::get_current_id(), get_query_var( 'paged' ), get_query_var( 'posts_per_page' ) ) ),
 			'title' => trim( wp_title( self::SEP, false, 'left' ) ),
-		);
+		) );
 
-		$data = wp_parse_args( $data, $defaults );
-
-		foreach ( array_keys( $defaults ) as $key )
-			setcookie( self::get_name( $key ), $data[$key], 0, '/' );
+		foreach ( $data as $key => $value )
+			setcookie( self::get_name( $key ), $value, 0, '/' );
 	}
 
 	public function clear_cookie() {
@@ -94,50 +87,13 @@ class Smarter_Navigation {
 		return self::NAME . '[' . $key . ']';
 	}
 
-	private function collect_ids() {
-		global $wpdb, $wp_query;
-
-		$query = $wp_query->request;
-
-		// replace SELECT
-		preg_match( "/^\s*SELECT\s+.*?\s+FROM/i", $query, $matches );
-		$query = preg_replace( "/^\s*SELECT\s+.*?\s+FROM/i", "SELECT {$wpdb->posts}.ID FROM", $query );
-
-		// replace LIMIT
-		if ( !preg_match( '/LIMIT\s+(\d+)(,\s+(\d+))?\s*$/', $query, $matches ) )
-			return array();
-
-		$limit = $matches[0];
-		if ( 2 == count( $matches ) ) {
-			$start = 0;
-			$finish = $matches[1];
-		}
-		else {
-			$start = $matches[1];
-			$finish = $matches[3];
-		}
-
-		$count = self::COUNT;
-
-		$new_start = $start - $count/2 + ( $finish - $start )/2;
-		if ( $new_start < 0 )
-			$new_start = 0;
-
-		$new_finish = $new_start + $count;
-
-		$query = str_replace( $limit, "LIMIT $new_start, $new_finish", $query );
-
-		return $wpdb->get_col( $query );
-	}
-
-
 	static function adjacent_post( $format, $title, $previous, $fallback, $in_same_cat, $excluded_categories ) {
 		if ( !is_single() )
 			return false;
 
 		$id = self::get_adjacent_id( $previous );
 
-		if ( false === $id )
+		if ( !$id )
 			return false;
 
 		if ( -1 == $id ) {
@@ -155,32 +111,56 @@ class Smarter_Navigation {
 		echo str_replace( '%link', $link, $format );
 	}
 
+	private static $cache;
+
+	/**
+	 * @return -1 if there's no data, 0 if no post found, post id otherwise
+	 */
 	static function get_adjacent_id( $previous = false ) {
-		global $post;
+		if ( empty( self::$data['query'] ) )
+			return -1;
 
-		if ( empty( self::$data['ids'] ) )
-			return -1;	// no data
+		$previous = (bool) $previous;
 
-		$ids = array_reverse( self::$data['ids'] );
+		if ( !isset( self::$cache[$previous] ) ) {
+			$args = array_merge( self::$data['query'], array(
+				'smarter_navigation' => $previous ? '<' : '>',
+				'ignore_sticky_posts' => true,
+				'posts_per_page' => 1,
+			) );
 
-		$pos = array_search( $post->ID, $ids );
+			$q = new WP_Query( $args );
 
-		// Get adjacent id
-		if ( $previous ) {
-			if ( 0 === $pos )
-				return false;
-
-			$id = $ids[$pos - 1];
-		} else {
-			if ( count( $ids ) - 1 === $pos )
-				return false;
-
-			$id = $ids[$pos + 1];
+			self::$cache[$previous] = empty( $q->posts ) ? 0 : $q->posts[0]->ID;
 		}
 
-		return $id;
+		return self::$cache[$previous];
 	}
 
+	static function posts_clauses( $bits, $wp_query ) {
+		global $wpdb;
+
+		$direction = $wp_query->get( 'smarter_navigation' );
+
+		if ( !$direction )
+			return $bits;
+
+		$orderby = preg_split( '|\s+|', $bits['orderby'] );
+		$orderby = reset( $orderby );
+
+		$field = explode( '.', $orderby );
+		$field = end( $field );
+
+		$post = get_queried_object();
+
+		if ( isset( $post->$field ) ) {
+			$bits['where'] .= $wpdb->prepare( " AND $orderby $direction %s ", $post->$field );
+		} else {
+			$bits['where'] = ' AND 1 = 0';
+		}
+
+		return $bits;
+	}
 
 	static function referrer_link( $format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left' ) {
 		$url = self::get_referrer_url();
