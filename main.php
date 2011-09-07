@@ -28,12 +28,7 @@ class Smarter_Navigation {
 	const NAME = 'smarter-navigation';
 	const SEP = '__SEP__';
 
-	static $data = array(
-		'ids' => '',
-		'url' => '',
-		'paging' => '',
-		'title' => ''
-	);
+	static $data;
 
 	function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'manage_cookie' ) );
@@ -42,7 +37,7 @@ class Smarter_Navigation {
 
 	function manage_cookie() {
 		// Default conditions
-		$clear_cond = is_home();
+		$clear_cond = false;
 		$read_cond = is_singular();
 		$set_cond = !is_404();
 
@@ -117,7 +112,7 @@ class Smarter_Navigation {
 	 * @return -1 if there's no data, 0 if no post found, post id otherwise
 	 */
 	static function get_adjacent_id( $previous = false ) {
-		if ( empty( self::$data['query'] ) )
+		if ( !isset( self::$data['query'] ) )
 			return -1;
 
 		$previous = (bool) $previous;
@@ -164,14 +159,18 @@ class Smarter_Navigation {
 		return $bits;
 	}
 
-	static function referrer_link( $format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left' ) {
+	static function referrer_link( $format = '%link', $title_format = '%title', $sep = '&raquo;', $sepdirection = 'left' ) {
 		$url = self::get_referrer_url();
 
 		if ( !is_single() || empty( $url ) )
 			return false;
 
-		$title = str_replace( '%title', self::get_title( $sep, $sepdirection ), $title );
-		$link = sprintf( "<a href='%s'>%s</a>", $url, $title );
+		$title = self::get_title( $sep, $sepdirection );
+		if ( empty( $title ) )
+			return;
+
+		$title_format = str_replace( '%title', $title, $title_format );
+		$link = sprintf( "<a href='%s'>%s</a>", $url, $title_format );
 		echo str_replace( '%link', $link, $format );
 	}
 
