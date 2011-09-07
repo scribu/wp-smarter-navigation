@@ -62,7 +62,7 @@ class Smarter_Navigation {
 	public function set_cookie( $data = '' ) {
 		$data = wp_parse_args( $data, array(
 			'query' => json_encode( $GLOBALS['wp_query']->query ),
-			'url' => self::get_current_url(),
+			'url' => is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 			'title' => trim( wp_title( self::SEP, false, 'left' ) ),
 		) );
 
@@ -195,22 +195,6 @@ class Smarter_Navigation {
 			$parts = array_reverse( $parts );
 
 		return implode( " $sep ", $parts );
-	}
-
-
-	private static function get_current_id() {
-		return $GLOBALS['posts'][0]->ID;
-	}
-
-	private static function get_current_url() {
-		$pageURL = is_ssl() ? 'https://' : 'http://';
-
-		if ( $_SERVER["SERVER_PORT"] != "80" )
-			$pageURL .= $_SERVER["SERVER_NAME"]. ":" .$_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
-		else
-			$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-
-		return $pageURL;
 	}
 }
 Smarter_Navigation::init();
