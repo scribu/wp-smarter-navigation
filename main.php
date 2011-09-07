@@ -62,7 +62,7 @@ class Smarter_Navigation {
 	public function set_cookie( $data = '' ) {
 		$data = wp_parse_args( $data, array(
 			'query' => json_encode( $GLOBALS['wp_query']->query ),
-			'url' => is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
+			'url' => ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 			'title' => trim( wp_title( self::SEP, false, 'left' ) ),
 		) );
 
