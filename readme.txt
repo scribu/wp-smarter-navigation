@@ -1,10 +1,9 @@
 === Smarter Navigation ===
 Contributors: scribu
-Donate link: http://scribu.net/paypal
 Tags: navigation, previous, next, referrer
 Requires at least: 2.8
-Tested up to: 3.0
-Stable tag: 1.2.1
+Tested up to: 3.3
+Stable tag: trunk
 
 Generates more specific previous / next post links based on referrer.
 
@@ -22,7 +21,7 @@ Well, you can do this with a similar pair of functions, provided by this plugin:
 
 Here's how it works:
 
-Whenever a visitor goes to an archive page (category, tag, date, author, search etc.), the plugin stores the list of post ids in a cookie.
+Whenever a visitor goes to an archive page (category, tag, date, author, search etc.), the plugin notes which archive it is in a browser cookie.
 
 Then, if the visitor goes to a single post from that archive page, the plugin generates the prev / next links based on the information in the cookie.
 
@@ -68,7 +67,9 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 == Changelog ==
 
 = 1.3 =
-* adjusting referrer URL
+* store query vars in cookie instead of individual post ids
+* fix referer link
+* [more info](http://scribu.net/wordpress/smarter-navigation/sn-1-3.html)
 
 = 1.2.1 =
 * enable $in_same_cat by default
