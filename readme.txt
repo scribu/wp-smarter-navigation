@@ -1,7 +1,7 @@
 === Smarter Navigation ===
 Contributors: scribu
 Tags: navigation, previous, next, referrer
-Requires at least: 2.8
+Requires at least: 3.1
 Tested up to: 3.3
 Stable tag: trunk
 
