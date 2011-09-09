@@ -65,8 +65,14 @@ class Smarter_Navigation {
 		if ( is_null( $data['query'] ) )
 			return;
 
+		$posts = self::get_posts( array_merge( $data['query'], array(
+			'fields' => 'ids',
+			'post__in' => array( get_queried_object_id() )
+		) ) );
+
 		// The current post doesn't belong to the group
-		// TODO
+		if ( empty( $posts ) )
+			return;
 
 		self::$data = $data;
 	}
@@ -125,19 +131,26 @@ class Smarter_Navigation {
 		$previous = (bool) $previous;
 
 		if ( !isset( self::$cache[$previous] ) ) {
-			$args = array_merge( self::$data['query'], array(
+			$posts = self::get_posts( array_merge( self::$data['query'], array(
 				'smarter_navigation' => $previous ? '<' : '>',
 				'order' => $previous ? 'DESC' : 'ASC',
-				'ignore_sticky_posts' => true,
-				'nopaging' => true,
-			) );
+			) ) );
 
-			$q = new WP_Query( $args );
-
-			self::$cache[$previous] = empty( $q->posts ) ? 0 : $q->posts[0]->ID;
+			self::$cache[$previous] = empty( $posts ) ? 0 : $posts[0]->ID;
 		}
 
 		return self::$cache[$previous];
+	}
+
+	private static function get_posts( $args = array() ) {
+		$args =	array_merge( $args, array(
+			'ignore_sticky_posts' => true,
+			'nopaging' => true,
+		) );
+
+		$q = new WP_Query( $args );
+
+		return $q->posts;
 	}
 
 	static function posts_clauses( $bits, $wp_query ) {
