@@ -66,6 +66,9 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 
 == Changelog ==
 
+= 1.3.1 =
+* fix case when multiple browser tabs are involved
+
 = 1.3 =
 * store query vars in cookie instead of individual post ids
 * fix referer link
