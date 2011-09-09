@@ -3,7 +3,7 @@
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
 Author: scribu
-Version: 1.3
+Version: 1.3.1-alpha
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
 
@@ -28,7 +28,7 @@ class Smarter_Navigation {
 	const NAME = 'smarter-navigation';
 	const SEP = '__SEP__';
 
-	static $data;
+	static $data = false;
 
 	function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'manage_cookie' ) );
@@ -51,12 +51,24 @@ class Smarter_Navigation {
 
 	private function read_cookie() {
 		if ( empty( $_COOKIE[self::NAME] ) )
-			return false;
+			return;
 
-		self::$data = $_COOKIE[self::NAME];
+		$data = $_COOKIE[self::NAME];
 
-		if ( isset( self::$data['query'] ) )
-			self::$data['query'] = json_decode( stripslashes( self::$data['query'] ), true );
+		// No referrer
+		if ( !isset( $data['query'] ) )
+			return;
+
+		$data['query'] = json_decode( stripslashes( $data['query'] ), true );
+
+		// JSON is invalid
+		if ( is_null( $data['query'] ) )
+			return;
+
+		// The current post doesn't belong to the group
+		// TODO
+
+		self::$data = $data;
 	}
 
 	public function set_cookie( $data = '' ) {
@@ -82,10 +94,7 @@ class Smarter_Navigation {
 		return self::NAME . '[' . $key . ']';
 	}
 
-	static function adjacent_post( $format, $title, $previous, $fallback, $in_same_cat, $excluded_categories ) {
-		if ( !is_single() )
-			return false;
-
+	static function adjacent_post( $format, $title_format, $previous, $fallback, $in_same_cat, $excluded_categories ) {
 		$id = self::get_adjacent_id( $previous );
 
 		if ( !$id )
@@ -96,14 +105,12 @@ class Smarter_Navigation {
 				return false;
 
 			if ( $previous )
-				return previous_post_link( $format, $title, $in_same_cat, $excluded_categories );
+				return previous_post_link( $format, $title_format, $in_same_cat, $excluded_categories );
 			else
-				return next_post_link( $format, $title, $in_same_cat, $excluded_categories );
+				return next_post_link( $format, $title_format, $in_same_cat, $excluded_categories );
 		}
 
-		$title = str_replace( '%title', get_the_title( $id ), $title );
-		$link = sprintf( "<a href='%s'>%s</a>", get_permalink( $id ), $title );
-		echo str_replace( '%link', $link, $format );
+		echo self::parse_format( $format, $title_format, get_permalink( $id ), get_the_title( $id ) );
 	}
 
 	private static $cache;
@@ -112,7 +119,7 @@ class Smarter_Navigation {
 	 * @return -1 if there's no data, 0 if no post found, post id otherwise
 	 */
 	static function get_adjacent_id( $previous = false ) {
-		if ( !isset( self::$data['query'] ) )
+		if ( !self::$data )
 			return -1;
 
 		$previous = (bool) $previous;
@@ -161,17 +168,14 @@ class Smarter_Navigation {
 
 	static function referrer_link( $format = '%link', $title_format = '%title', $sep = '&raquo;', $sepdirection = 'left' ) {
 		$url = self::get_referrer_url();
-
-		if ( !is_single() || empty( $url ) )
-			return false;
+		if ( empty( $url ) )
+			return;
 
 		$title = self::get_title( $sep, $sepdirection );
 		if ( empty( $title ) )
 			return;
 
-		$title_format = str_replace( '%title', $title, $title_format );
-		$link = sprintf( "<a href='%s'>%s</a>", $url, $title_format );
-		echo str_replace( '%link', $link, $format );
+		echo self::parse_format( $format, $title_format, $url, $title );
 	}
 
 	static function get_referrer_url() {
@@ -195,6 +199,12 @@ class Smarter_Navigation {
 			$parts = array_reverse( $parts );
 
 		return implode( " $sep ", $parts );
+	}
+
+	private static function parse_format( $link_format, $title_format, $url, $title ) {
+		$title = str_replace( '%title', $title, $title_format );
+		$link = sprintf( "<a href='%s'>%s</a>", $url, $title );
+		return str_replace( '%link', $link, $link_format );
 	}
 }
 Smarter_Navigation::init();

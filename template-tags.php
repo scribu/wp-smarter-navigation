@@ -17,9 +17,9 @@ function get_adjacent_id_smart( $previous = false ) {
 	return Smarter_Navigation::get_adjacent_id( $previous );
 }
 
-// Displays a link to the persistent referer
+// Displays a link to the persistent referrer
 function referrer_link( $format = '%link', $title = '%title', $sep = '&raquo;', $sepdirection = 'left' ) {
-	return Smarter_Navigation::referrer_link( $format, $title, $sep, $sepdirection );
+	echo Smarter_Navigation::referrer_link( $format, $title, $sep, $sepdirection );
 }
 
 // Retrieve the category, based on the referrer URL. Useful if you have posts with multiple categories
