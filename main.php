@@ -65,17 +65,13 @@ class Smarter_Navigation {
 		if ( is_null( $data['query'] ) )
 			return;
 
-		$posts = self::get_posts( array_merge( $data['query'], array(
-			'fields' => 'ids',
-			'post__in' => array( get_queried_object_id() ),
-			'nopaging' => true
-		) ) );
+		self::$data = $data;
+
+		self::find_posts_in_same_interval();
 
 		// The current post doesn't belong to the group
-		if ( empty( $posts ) )
-			return;
-
-		self::$data = $data;
+		if ( !in_array( get_queried_object_id(), self::$cache['same'] ) )
+			self::$data = false;
 	}
 
 	public function set_cookie( $data = '' ) {
@@ -138,31 +134,35 @@ class Smarter_Navigation {
 		return self::$cache[$previous];
 	}
 
-	private static function find_adjacent_post( $previous ) {
-		if ( !isset( self::$cache['same_date'] ) ) {
-			self::$cache['same_date'] = self::get_posts( array_merge( self::$data['query'], array(
+	private static function find_posts_in_same_interval() {
+		if ( !isset( self::$cache['same'] ) ) {
+			self::$cache['same'] = self::get_posts( array(
 				'_sn_post' => get_queried_object(),
 				'_sn_op' => '=',
 				'order' => 'ASC',
 				'fields' => 'ids',
 				'nopaging' => true
-			) ) );
+			) );
 		}
+	}
 
-		$poz = array_search( get_queried_object_id(), self::$cache['same_date'] );
+	private static function find_adjacent_post( $previous ) {
+		self::find_posts_in_same_interval();
+
+		$poz = array_search( get_queried_object_id(), self::$cache['same'] );
 
 		$poz += $previous ? 1 : -1;
 
-		if ( isset( self::$cache['same_date'][ $poz ] ) )
-			return self::$cache['same_date'][ $poz ];
+		if ( isset( self::$cache['same'][ $poz ] ) )
+			return self::$cache['same'][ $poz ];
 
 		// find first post in the adjacent interval
-		$next_posts = self::get_posts( array_merge( self::$data['query'], array(
+		$next_posts = self::get_posts( array(
 			'_sn_post' => get_queried_object(),
 			'_sn_op' => $previous ? '<' : '>',
 			'order' => $previous ? 'DESC' : 'ASC',
 			'posts_per_page' => 2
-		) ) );
+		) );
 
 		if ( empty( $next_posts ) )
 			return 0;
@@ -173,12 +173,12 @@ class Smarter_Navigation {
 			return $post->ID;
 
 		// there's more than one post in the adjacent interval, so need to get the first/last one
-		$final_posts = self::get_posts( array_merge( self::$data['query'], array(
+		$final_posts = self::get_posts( array(
 			'_sn_post' => $post,
 			'_sn_op' => '=',
 			'order' => 'ASC',
 			'nopaging' => true,
-		) ) );
+		) );
 
 		if ( $previous )
 			return reset( $final_posts )->ID;
@@ -187,7 +187,7 @@ class Smarter_Navigation {
 	}
 
 	private static function get_posts( $args = array() ) {
-		$args =	array_merge( $args, array(
+		$args =	array_merge( self::$data['query'], $args, array(
 			'ignore_sticky_posts' => true,
 		) );
 
