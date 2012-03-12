@@ -67,7 +67,13 @@ class Smarter_Navigation {
 
 		self::$data = $data;
 
-		self::find_posts_in_same_interval();
+		self::$cache['same'] = self::get_posts( array(
+			'_sn_post' => get_queried_object(),
+			'_sn_op' => '=',
+			'order' => 'ASC',
+			'fields' => 'ids',
+			'nopaging' => true
+		) );
 
 		// The current post doesn't belong to the group
 		if ( !in_array( get_queried_object_id(), self::$cache['same'] ) )
@@ -134,21 +140,7 @@ class Smarter_Navigation {
 		return self::$cache[$previous];
 	}
 
-	private static function find_posts_in_same_interval() {
-		if ( !isset( self::$cache['same'] ) ) {
-			self::$cache['same'] = self::get_posts( array(
-				'_sn_post' => get_queried_object(),
-				'_sn_op' => '=',
-				'order' => 'ASC',
-				'fields' => 'ids',
-				'nopaging' => true
-			) );
-		}
-	}
-
 	private static function find_adjacent_post( $previous ) {
-		self::find_posts_in_same_interval();
-
 		$poz = array_search( get_queried_object_id(), self::$cache['same'] );
 
 		$poz += $previous ? 1 : -1;
