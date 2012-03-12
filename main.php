@@ -67,7 +67,8 @@ class Smarter_Navigation {
 
 		$posts = self::get_posts( array_merge( $data['query'], array(
 			'fields' => 'ids',
-			'post__in' => array( get_queried_object_id() )
+			'post__in' => array( get_queried_object_id() ),
+			'nopaging' => true
 		) ) );
 
 		// The current post doesn't belong to the group
@@ -131,21 +132,63 @@ class Smarter_Navigation {
 		$previous = (bool) $previous;
 
 		if ( !isset( self::$cache[$previous] ) ) {
-			$posts = self::get_posts( array_merge( self::$data['query'], array(
-				'smarter_navigation' => $previous ? '<' : '>',
-				'order' => $previous ? 'DESC' : 'ASC',
-			) ) );
-
-			self::$cache[$previous] = empty( $posts ) ? 0 : $posts[0]->ID;
+			self::$cache[$previous] = self::find_adjacent_post( $previous );
 		}
 
 		return self::$cache[$previous];
 	}
 
+	private static function find_adjacent_post( $previous ) {
+		if ( !isset( self::$cache['same_date'] ) ) {
+			self::$cache['same_date'] = self::get_posts( array_merge( self::$data['query'], array(
+				'_sn_post' => get_queried_object(),
+				'_sn_op' => '=',
+				'order' => 'ASC',
+				'fields' => 'ids',
+				'nopaging' => true
+			) ) );
+		}
+
+		$poz = array_search( get_queried_object_id(), self::$cache['same_date'] );
+
+		$poz += $previous ? 1 : -1;
+
+		if ( isset( self::$cache['same_date'][ $poz ] ) )
+			return self::$cache['same_date'][ $poz ];
+
+		// find first post in the adjacent interval
+		$next_posts = self::get_posts( array_merge( self::$data['query'], array(
+			'_sn_post' => get_queried_object(),
+			'_sn_op' => $previous ? '<' : '>',
+			'order' => $previous ? 'DESC' : 'ASC',
+			'posts_per_page' => 2
+		) ) );
+
+		if ( empty( $next_posts ) )
+			return 0;
+
+		$post = reset( $next_posts );
+
+		if ( count( $next_posts ) == 1 )
+			return $post->ID;
+
+		// there's more than one post in the adjacent interval, so need to get the first/last one
+		$final_posts = self::get_posts( array_merge( self::$data['query'], array(
+			'_sn_post' => $post,
+			'_sn_op' => '=',
+			'order' => 'ASC',
+			'nopaging' => true,
+		) ) );
+
+		if ( $previous )
+			return reset( $final_posts )->ID;
+
+		return end( $final_posts )->ID;
+	}
+
 	private static function get_posts( $args = array() ) {
 		$args =	array_merge( $args, array(
 			'ignore_sticky_posts' => true,
-			'nopaging' => true,
 		) );
 
 		$q = new WP_Query( $args );
@@ -156,9 +199,10 @@ class Smarter_Navigation {
 	static function posts_clauses( $bits, $wp_query ) {
 		global $wpdb;
 
-		$direction = $wp_query->get( 'smarter_navigation' );
+		$op = $wp_query->get( '_sn_op' );
+		$post = $wp_query->get( '_sn_post' );
 
-		if ( !$direction )
+		if ( !$op )
 			return $bits;
 
 		$orderby = preg_split( '|\s+|', $bits['orderby'] );
@@ -167,11 +211,8 @@ class Smarter_Navigation {
 		$field = explode( '.', $orderby );
 		$field = end( $field );
 
-		$post = get_queried_object();
-
 		if ( isset( $post->$field ) ) {
-			$bits['where'] .= $wpdb->prepare( " AND $orderby $direction %s ", $post->$field );
-			$bits['limits'] = 'LIMIT 1';
+			$bits['where'] .= $wpdb->prepare( " AND $orderby $op %s ", $post->$field );
 		} else {
 			$bits['where'] = ' AND 1 = 0';
 		}
