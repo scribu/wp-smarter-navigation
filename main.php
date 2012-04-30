@@ -6,8 +6,6 @@ Author: scribu
 Version: 1.3.1-alpha
 Author URI: http://scribu.net
 Plugin URI: http://scribu.net/wordpress/smarter-navigation
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 class Smarter_Navigation {
