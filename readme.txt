@@ -1,9 +1,9 @@
 === Smarter Navigation ===
 Contributors: scribu
 Tags: navigation, previous, next, referrer
-Requires at least: 3.1
-Tested up to: 3.3
-Stable tag: trunk
+Requires at least: 3.2
+Tested up to: 3.5
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,7 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 
 = 1.3.1 =
 * fix case when multiple browser tabs are involved
+* fix case when multiple posts have the exact same date
 
 = 1.3 =
 * store query vars in cookie instead of individual post ids
