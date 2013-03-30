@@ -21,15 +21,15 @@ class Smarter_Navigation {
 
 	function manage_cookie() {
 		// Default conditions
-		$clear_cond = false;
-		$read_cond = is_singular();
-		$set_cond = !is_404();
+		$clear_condition = false;
+		$read_condition = is_singular();
+		$set_condition = !is_404();
 
-		if ( apply_filters( 'smarter_nav_clear', $clear_cond ) )
+		if ( apply_filters( 'smarter_nav_clear', $clear_condition ) )
 			self::clear_cookie();
-		elseif ( apply_filters( 'smarter_nav_read', $read_cond ) )
+		elseif ( apply_filters( 'smarter_nav_read', $read_condition ) )
 			self::read_cookie();
-		elseif ( apply_filters( 'smarter_nav_set', $set_cond ) )
+		elseif ( apply_filters( 'smarter_nav_set', $set_condition ) )
 			self::set_cookie();
 	}
 
@@ -214,6 +214,7 @@ class Smarter_Navigation {
 			return '';
 
 		return self::$data['url'];
+
 	}
 
 	static function get_title( $sep, $sepdir ) {
