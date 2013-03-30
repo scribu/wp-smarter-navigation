@@ -137,7 +137,8 @@ class Smarter_Navigation {
 			'_sn_post' => get_queried_object(),
 			'_sn_op' => $previous ? '<' : '>',
 			'order' => $previous ? 'DESC' : 'ASC',
-			'posts_per_page' => 2
+			'posts_per_page' => 2,
+			'paged' => 1
 		) );
 
 		if ( empty( $next_posts ) )
@@ -164,7 +165,7 @@ class Smarter_Navigation {
 
 	private static function get_posts( $args = array() ) {
 		$args =	array_merge( self::$data['query'], $args, array(
-			'ignore_sticky_posts' => true,
+			'ignore_sticky_posts' => true
 		) );
 
 		$q = new WP_Query( $args );
