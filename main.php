@@ -209,7 +209,6 @@ class Smarter_Navigation {
 	}
 
 	static function get_referrer_url() {
-		global $wp_rewrite;
 
 		if ( !isset( self::$data['url'] ) || !isset( self::$data['query'] ) )
 			return '';
