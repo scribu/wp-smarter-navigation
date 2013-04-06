@@ -1,9 +1,9 @@
 === Smarter Navigation ===
-Contributors: scribu
+Contributors: scribu, versusbassz
 Tags: navigation, previous, next, referrer
 Requires at least: 3.2
 Tested up to: 3.5
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,7 +36,7 @@ Links: [Plugin News](http://scribu.net/wordpress/smarter-navigation) | [Author's
 
 = Basic usage =
 
-Go to your theme directoy and open single.php.
+Go to your theme directory and open single.php.
 
 Replace 
 
@@ -67,6 +67,9 @@ Make sure your host is running PHP 5. Add this line to wp-config.php to check:
 `var_dump(PHP_VERSION);`
 
 == Changelog ==
+
+= 1.3.2 =
+* fix case when plugin worked incorrect with pagination
 
 = 1.3.1 =
 * fix case when multiple browser tabs are involved
