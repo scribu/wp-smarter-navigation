@@ -2,10 +2,9 @@
 /*
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
-Author: scribu
+Author: scribu, versusbassz
 Version: 1.3.2
-Author URI: http://scribu.net
-Plugin URI: http://scribu.net/wordpress/smarter-navigation
+Plugin URI: http://wordpress.org/extend/plugins/smarter-navigation/
 */
 
 class Smarter_Navigation {

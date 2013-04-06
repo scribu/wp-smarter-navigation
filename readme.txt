@@ -1,5 +1,5 @@
 === Smarter Navigation ===
-Contributors: scribu
+Contributors: scribu, versusbassz
 Tags: navigation, previous, next, referrer
 Requires at least: 3.2
 Tested up to: 3.5
