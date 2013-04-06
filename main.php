@@ -2,10 +2,9 @@
 /*
 Plugin Name: Smarter Navigation
 Description: Generates more specific previous / next post links based on referrer.
-Author: scribu
-Version: 1.3.1
-Author URI: http://scribu.net
-Plugin URI: http://scribu.net/wordpress/smarter-navigation
+Author: scribu, versusbassz
+Version: 1.3.2
+Plugin URI: http://wordpress.org/extend/plugins/smarter-navigation/
 */
 
 class Smarter_Navigation {
@@ -21,15 +20,15 @@ class Smarter_Navigation {
 
 	function manage_cookie() {
 		// Default conditions
-		$clear_cond = false;
-		$read_cond = is_singular();
-		$set_cond = !is_404();
+		$clear_condition = false;
+		$read_condition = is_singular();
+		$set_condition = !is_404();
 
-		if ( apply_filters( 'smarter_nav_clear', $clear_cond ) )
+		if ( apply_filters( 'smarter_nav_clear', $clear_condition ) )
 			self::clear_cookie();
-		elseif ( apply_filters( 'smarter_nav_read', $read_cond ) )
+		elseif ( apply_filters( 'smarter_nav_read', $read_condition ) )
 			self::read_cookie();
-		elseif ( apply_filters( 'smarter_nav_set', $set_cond ) )
+		elseif ( apply_filters( 'smarter_nav_set', $set_condition ) )
 			self::set_cookie();
 	}
 
@@ -137,7 +136,8 @@ class Smarter_Navigation {
 			'_sn_post' => get_queried_object(),
 			'_sn_op' => $previous ? '<' : '>',
 			'order' => $previous ? 'DESC' : 'ASC',
-			'posts_per_page' => 2
+			'posts_per_page' => 2,
+			'paged' => 1
 		) );
 
 		if ( empty( $next_posts ) )
@@ -164,7 +164,7 @@ class Smarter_Navigation {
 
 	private static function get_posts( $args = array() ) {
 		$args =	array_merge( self::$data['query'], $args, array(
-			'ignore_sticky_posts' => true,
+			'ignore_sticky_posts' => true
 		) );
 
 		$q = new WP_Query( $args );
@@ -209,12 +209,12 @@ class Smarter_Navigation {
 	}
 
 	static function get_referrer_url() {
-		global $wp_rewrite;
 
 		if ( !isset( self::$data['url'] ) || !isset( self::$data['query'] ) )
 			return '';
 
 		return self::$data['url'];
+
 	}
 
 	static function get_title( $sep, $sepdir ) {
