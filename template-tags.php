@@ -22,24 +22,6 @@ function referrer_link( $format = '%link', $title = '%title', $sep = '&raquo;', 
 	echo Smarter_Navigation::referrer_link( $format, $title, $sep, $sepdirection );
 }
 
-// Retrieve the category, based on the referrer URL. Useful if you have posts with multiple categories
-// This should be phased out and replaced with get_referrer_term
-function get_referrer_category() {
-	global $posts;
-
-	if ( ! $referrer_url = get_referrer_url( false ) )
-		return false;
-
-	foreach ( get_the_category( $posts[0]->ID ) as $cat ) {
-		$cat_link = get_category_link( $cat->term_id );
-
-		if ( false !== strpos( $referrer_url, $cat_link ) )
-			return $cat;
-	}
-
-	return false;
-}
-
 // Retrieve the term, based on the referrer URL. Useful if you have posts with multiple terms
 // $taxonomy defaults to 'category'. Can be changed to custom taxonomy
 function get_referrer_term( $taxonomy = 'category' ) {
@@ -56,6 +38,18 @@ function get_referrer_term( $taxonomy = 'category' ) {
 	}
 
 	return false;
+}
+
+// Retrieve the category, based on the referrer URL. Useful if you have posts with multiple categories
+// Uses get_referrer_term()
+function get_referrer_category() {
+
+	$referrer = get_referrer_term( 'category' );
+
+	if ( is_wp_error( $referrer ) )
+		return false;
+
+	return $referrer;
 }
 
 // Retrieve the full referrer URL

@@ -13,27 +13,26 @@ class Smarter_Navigation {
 
 	static $data = false;
 
-	function init() {
+	static function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'manage_cookie' ) );
 		add_action( 'posts_clauses', array( __CLASS__, 'posts_clauses' ), 10, 2 );
 	}
 
-	public static function manage_cookie() {
+	static function manage_cookie() {
 		// Default conditions
 		$clear_condition = false;
 		$read_condition = is_singular();
 		$set_condition = !is_404();
-		$var = new self();
 
 		if ( apply_filters( 'smarter_nav_clear', $clear_condition ) )
-			$var->clear_cookie();
+			self::clear_cookie();
 		elseif ( apply_filters( 'smarter_nav_read', $read_condition ) )
-			$var->read_cookie();
+			self::read_cookie();
 		elseif ( apply_filters( 'smarter_nav_set', $set_condition ) )
-			$var->set_cookie();
+			self::set_cookie();
 	}
 
-	private function read_cookie() {
+	private static function read_cookie() {
 		if ( empty( $_COOKIE[self::NAME] ) )
 			return;
 
@@ -64,7 +63,7 @@ class Smarter_Navigation {
 			self::$data = false;
 	}
 
-	public function set_cookie( $data = '' ) {
+	public static function set_cookie( $data = '' ) {
 		$data = wp_parse_args( $data, array(
 			'query' => json_encode( $GLOBALS['wp_query']->query ),
 			'url' => ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
@@ -75,7 +74,7 @@ class Smarter_Navigation {
 			setcookie( self::get_name( $key ), $value, 0, '/' );
 	}
 
-	public function clear_cookie() {
+	public static function clear_cookie() {
 		if ( empty( $_COOKIE[self::NAME] ) )
 			return;
 
@@ -83,11 +82,11 @@ class Smarter_Navigation {
 			setcookie( self::get_name( $key ), false, 0, '/' );
 	}
 
-	private function get_name( $key ) {
+	private static function get_name( $key ) {
 		return self::NAME . '[' . $key . ']';
 	}
 
-	static function adjacent_post( $format, $title_format, $previous, $fallback, $in_same_term, $excluded_terms, $taxonomy ) {
+	static function adjacent_post( $format, $title_format, $previous, $fallback, $in_same_cat, $excluded_categories ) {
 		$id = self::get_adjacent_id( $previous );
 
 		if ( !$id )
@@ -98,9 +97,9 @@ class Smarter_Navigation {
 				return false;
 
 			if ( $previous )
-				return previous_post_link( $format, $title_format, $in_same_term, $excluded_terms, $taxonomy );
+				return previous_post_link( $format, $title_format, $in_same_cat, $excluded_categories );
 			else
-				return next_post_link( $format, $title_format, $in_same_term, $excluded_terms, $taxonomy );
+				return next_post_link( $format, $title_format, $in_same_cat, $excluded_categories );
 		}
 
 		echo self::parse_format( $format, $title_format, get_permalink( $id ), get_the_title( $id ) );
@@ -238,8 +237,7 @@ class Smarter_Navigation {
 		return str_replace( '%link', $link, $link_format );
 	}
 }
-$var = new Smarter_Navigation();
-$var->init();
+Smarter_Navigation::init();
 
 include dirname( __FILE__ ) . '/template-tags.php';
 
