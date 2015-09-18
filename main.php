@@ -13,12 +13,12 @@ class Smarter_Navigation {
 
 	static $data = false;
 
-	function init() {
+	static function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'manage_cookie' ) );
 		add_action( 'posts_clauses', array( __CLASS__, 'posts_clauses' ), 10, 2 );
 	}
 
-	function manage_cookie() {
+	static function manage_cookie() {
 		// Default conditions
 		$clear_condition = false;
 		$read_condition = is_singular();
@@ -32,7 +32,7 @@ class Smarter_Navigation {
 			self::set_cookie();
 	}
 
-	private function read_cookie() {
+	private static function read_cookie() {
 		if ( empty( $_COOKIE[self::NAME] ) )
 			return;
 
@@ -63,7 +63,7 @@ class Smarter_Navigation {
 			self::$data = false;
 	}
 
-	public function set_cookie( $data = '' ) {
+	public static function set_cookie( $data = '' ) {
 		$data = wp_parse_args( $data, array(
 			'query' => json_encode( $GLOBALS['wp_query']->query ),
 			'url' => ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
@@ -74,7 +74,7 @@ class Smarter_Navigation {
 			setcookie( self::get_name( $key ), $value, 0, '/' );
 	}
 
-	public function clear_cookie() {
+	public static function clear_cookie() {
 		if ( empty( $_COOKIE[self::NAME] ) )
 			return;
 
@@ -82,7 +82,7 @@ class Smarter_Navigation {
 			setcookie( self::get_name( $key ), false, 0, '/' );
 	}
 
-	private function get_name( $key ) {
+	private static function get_name( $key ) {
 		return self::NAME . '[' . $key . ']';
 	}
 
