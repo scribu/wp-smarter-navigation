@@ -86,7 +86,7 @@ class Smarter_Navigation {
 		return self::NAME . '[' . $key . ']';
 	}
 
-	static function adjacent_post( $format, $title_format, $previous, $fallback, $in_same_cat, $excluded_categories ) {
+	static function adjacent_post( $format, $title_format, $previous, $fallback, $in_same_term, $excluded_terms, $taxonomy ) {
 		$id = self::get_adjacent_id( $previous );
 
 		if ( !$id )
@@ -97,9 +97,9 @@ class Smarter_Navigation {
 				return false;
 
 			if ( $previous )
-				return previous_post_link( $format, $title_format, $in_same_cat, $excluded_categories );
+				return previous_post_link( $format, $title_format, $in_same_term, $excluded_terms, $taxonomy );
 			else
-				return next_post_link( $format, $title_format, $in_same_cat, $excluded_categories );
+				return next_post_link( $format, $title_format, $in_same_term, $excluded_terms, $taxonomy );
 		}
 
 		echo self::parse_format( $format, $title_format, get_permalink( $id ), get_the_title( $id ) );
